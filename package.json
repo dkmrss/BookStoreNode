@@ -2,31 +2,19 @@
   "name": "node",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/index.js",
-    "startdebug": "nodemon --inspect src/index.js"
+    "start": "nodemon index.js",
+    "startdebug": "nodemon --inspect index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RyuuMugen/test_node.git"
-  },
-  "keywords": [
-    "node",
-    "test"
-  ],
-  "author": "RyuMugen",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/RyuuMugen/test_node/issues"
-  },
-  "homepage": "https://github.com/RyuuMugen/test_node#readme",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "morgan": "^1.10.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.2"
+    "mysql": "^2.18.1",
+    "nodemon": "^3.1.3"
   }
 }
