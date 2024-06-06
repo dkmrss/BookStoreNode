@@ -2,6 +2,7 @@ require("dotenv").config();
 const createError = require("http-errors");
 const express = require("express");
 const dbConnection = require("./app/configs/database");
+const systemConfig = require("./app/configs/system"); // Đã thêm dòng này
 
 const app = express();
 app.use(express.json());
@@ -15,19 +16,11 @@ global.__path_models = __path_app + pathConfig.folder_models + "/";
 global.__path_routers = __path_app + pathConfig.folder_routers + "/";
 global.__path_configs = __path_app + pathConfig.folder_configs + "/";
 
-const systemConfig = require(__path_configs + "system");
-const dbConfig = require(__path_configs + "database");
-
+// Sử dụng cấu hình cổng từ file system.js
 app.locals.systemConfig = systemConfig;
 
-// Kết nối cơ sở dữ liệu
-dbConnection.connect((err) => {
-  if (err) {
-    console.error("Kết nối thất bại:", err.message);
-    return;
-  }
-  console.log("Kết nối thành công đến MySQL");
-});
+// Gọi hàm để kết nối đến cơ sở dữ liệu
+const connection = dbConnection;
 
 app.use("/api/v1/", require(__path_routers));
 
@@ -41,6 +34,12 @@ app.use(function (err, req, res, next) {
 
   res.status(err.status || 500);
   res.end("Lỗi, URL không đúng");
+});
+
+// Sử dụng cổng từ cấu hình hệ thống
+const port = app.locals.systemConfig.port || 3000;
+app.listen(port, () => {
+  console.log(`Ứng dụng đang chạy trên cổng ${port}`);
 });
 
 module.exports = app;
