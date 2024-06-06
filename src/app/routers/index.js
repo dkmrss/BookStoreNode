@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Route cho các ví dụ
 // Route cho người dùng
-router.use("/users", UsersRouter);
+router.use("", UsersRouter);
 
 // // Route cho sách
 // router.use('/books', BookRouter);

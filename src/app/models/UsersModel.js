@@ -9,6 +9,7 @@ class UserModel {
                     message: "Không thể lấy danh sách người dùng",
                     success: false,
                     error: err.message,
+                    totalCount: 0,
                 });
             }
             callback({
@@ -16,6 +17,7 @@ class UserModel {
                 message: "Danh sách người dùng đã được lấy thành công",
                 success: true,
                 error: "",
+                totalCount: rows.length,
             });
         });
     }
@@ -48,20 +50,53 @@ class UserModel {
     }
 
     static create(newUser, callback) {
-        db.query('INSERT INTO users SET ?', newUser, (err, result) => {
+        const { email, password, name, phone, address, avatar } = newUser;
+        
+        // Kiểm tra nếu avatar là một chuỗi base64
+        // if (!avatar || !avatar.startsWith('data:image')) {
+        //     return callback({
+        //         data: [],
+        //         message: "Ảnh không hợp lệ",
+        //         success: false,
+        //         error: "Avatar must be a base64 encoded image.",
+        //     });
+        // }
+
+        // Kiểm tra email trùng
+        db.query('SELECT * FROM users WHERE email = ?', [email], (err, rows) => {
             if (err) {
                 return callback({
                     data: [],
-                    message: "Không thể thêm người dùng",
+                    message: "Lỗi khi kiểm tra email",
                     success: false,
                     error: err.message,
                 });
             }
-            callback({
-                data: result.insertId,
-                message: "Người dùng đã được thêm thành công",
-                success: true,
-                error: "",
+            if (rows.length > 0) {
+                return callback({
+                    data: [],
+                    message: "Email đã tồn tại",
+                    success: false,
+                    error: "Email already exists.",
+                });
+            }
+
+            // Thêm người dùng mới
+            db.query('INSERT INTO users SET ?', { email, password, name, phone, address, avatar }, (err, result) => {
+                if (err) {
+                    return callback({
+                        data: [],
+                        message: "Không thể thêm người dùng",
+                        success: false,
+                        error: err.message,
+                    });
+                }
+                callback({
+                    data: result.insertId,
+                    message: "Người dùng đã được thêm thành công",
+                    success: true,
+                    error: "",
+                });
             });
         });
     }
@@ -128,6 +163,7 @@ class UserModel {
                     message: "Không thể lấy danh sách người dùng",
                     success: false,
                     error: err.message,
+                     totalCount: 0,
                 });
             }
             callback({
@@ -135,6 +171,7 @@ class UserModel {
                 message: "Danh sách người dùng đã được lấy thành công",
                 success: true,
                 error: "",
+                totalCount: rows.length,
             });
         });
     }

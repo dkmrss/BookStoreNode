@@ -1,6 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/UsersModel");
+const multer = require('multer');
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'assets/avt/') // Thư mục để lưu trữ file ảnh
+  },
+  filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname); // Tên file sẽ được lưu trữ
+  }
+});
+
+const upload = multer({ storage: storage })
+
 
 // Route để lấy danh sách tất cả người dùng
 router.get("/users/get-lists", (req, res) => {
@@ -18,11 +32,15 @@ router.get("/users/user-detail/:id", (req, res) => {
 });
 
 // Route để tạo một người dùng mới
-router.post("/users/create", (req, res) => {
-  const newUser = req.body;
-  UserModel.create(newUser, (result) => {
-    res.status(201).json(result);
-  });
+router.post('/users/create', upload.single('avatar'), (req, res) => {
+  const { email, password, name, phone, address } = req.body;
+    const avatar = req.file ? req.file.path : ''; // Lưu đường dẫn của file ảnh vào trường avatar
+
+    const newUser = { email, password, name, phone, address, avatar };
+
+    UserModel.create(newUser, (result) => {
+        res.json(result);
+    });
 });
 
 // Route để cập nhật thông tin của một người dùng
@@ -43,11 +61,11 @@ router.delete("/users/delete/:id", (req, res) => {
 });
 
 // Route để lấy danh sách người dùng với giới hạn và lệch cho phân trang
-router.get("/users/get-list?page&limit", (req, res) => {
-  const page = parseInt(req.query.page);
-  const limit = parseInt(req.query.limit);
-  const offset = (page - 1) * limit;
-  UserModel.getListWithLimitOffset(limit, offset, (result) => {
+router.get("/users/get-list", (req, res) => {
+  const take = parseInt(req.query.take);
+  const skip = parseInt(req.query.skip);
+
+  UserModel.getListWithLimitOffset(take, skip, (result) => {
     res.status(200).json(result);
   });
 });
