@@ -72,4 +72,61 @@ router.get("/get-list", (req, res) => {
   });
 });
 
+// Cập nhật status 
+router.put("/status/:id", (req, res) => {
+  const id = req.params.id;
+    
+  CategoryModel.getDetail(id, (result) => {
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+
+        // Chuyển đổi trạng thái
+        const newStatus = result.data.status === 0 ? 1 : 0;
+
+        CategoryModel.updateStatus(id, newStatus, (result) => {
+            res.status(result.success ? 200 : 400).json(result);
+        });
+    });
+  
+ 
+});
+
+// Cập nhật trash 
+router.put("/trash/:id", (req, res) => {
+  const id = req.params.id;
+    
+  CategoryModel.getDetail(id, (result) => {
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+        // Chuyển đổi trạng thái
+        const newStatus = result.data.trash === 0 ? 1 : 0;
+
+        CategoryModel.updateTrash(id, newStatus, (result) => {
+            res.status(result.success ? 200 : 400).json(result);
+        });
+    });
+});
+
+// Lấy danh sách theo status
+router.get("/status/:status", (req, res) => {
+  const status = req.params.status;
+
+  CategoryModel.getListByStatus(status, (result) => {
+      res.status(result.success ? 200 : 400).json(result);
+  });
+});
+
+// Lấy danh sách theo trash
+router.get("/trash/:trash", (req, res) => {
+  const trash = req.params.trash;
+
+  CategoryModel.getListByTrash(trash, (result) => {
+      res.status(result.success ? 200 : 400).json(result);
+  });
+});
+
+
+
 module.exports = router;

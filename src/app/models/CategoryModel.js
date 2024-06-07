@@ -117,48 +117,7 @@ class CategoryModel {
   }
 
   static update(id, updatedCategory, callback) {
-    // const { error } = categorySchema.validate(updatedCategory);
-    // if (error) {
-    //   return callback({
-    //     data: [],
-    //     message: "Dữ liệu không hợp lệ",
-    //     success: false,
-    //     error: error.details[0].message,
-    //   });
-    // }
-    db.query(
-      "UPDATE category SET ? WHERE id = ?",
-      [updatedCategory, id],
-      (err, result) => {
-        if (err) {
-          return callback({
-            data: [],
-            message: "Không thể cập nhật thông tin danh mục",
-            success: false,
-            error: err.message,
-          });
-        }
-        if (result.affectedRows === 0) {
-          return callback({
-            data: [],
-            message: "Không tìm thấy danh mục để cập nhật",
-            success: false,
-            error: "",
-          });
-        }
-        callback({
-          data: id,
-          message: "Thông tin danh mục đã được cập nhật thành công",
-          success: true,
-          error: "",
-        });
-      }
-    );
-  }
 
-  static update(id, updatedCategory, callback) {
-
-    
     // Lấy thông tin danh mục hiện tại
     db.query('SELECT illustration FROM category WHERE id = ?', [id], (err, rows) => {
         if (err) {
@@ -237,6 +196,98 @@ class CategoryModel {
       });
     });
   }
+
+  static updateStatus(id, status, callback) {
+    db.query('UPDATE category SET status = ? WHERE id = ?', [status, id], (err, result) => {
+        if (err) {
+            return callback({
+                data: [],
+                message: "Không thể cập nhật trạng thái danh mục",
+                success: false,
+                error: err.message,
+            });
+        }
+        if (result.affectedRows === 0) {
+            return callback({
+                data: [],
+                message: "Không tìm thấy danh mục để cập nhật",
+                success: false,
+                error: "",
+            });
+        }
+        callback({
+            data: id,
+            message: "Trạng thái danh mục đã được cập nhật thành công",
+            success: true,
+            error: "",
+        });
+    });
+}
+
+static updateTrash(id, trash, callback) {
+    db.query('UPDATE category SET trash = ? WHERE id = ?', [trash, id], (err, result) => {
+        if (err) {
+            return callback({
+                data: [],
+                message: "Không thể cập nhật trạng thái xoá của danh mục",
+                success: false,
+                error: err.message,
+            });
+        }
+        if (result.affectedRows === 0) {
+            return callback({
+                data: [],
+                message: "Không tìm thấy danh mục để cập nhật",
+                success: false,
+                error: "",
+            });
+        }
+        callback({
+            data: id,
+            message: "Trạng thái xoá của danh mục đã được cập nhật thành công",
+            success: true,
+            error: "",
+        });
+    });
+}
+
+static getListByStatus(status, callback) {
+    db.query('SELECT * FROM category WHERE status = ?', [status], (err, rows) => {
+        if (err) {
+            return callback({
+                data: [],
+                message: "Không thể lấy danh sách danh mục theo trạng thái",
+                success: false,
+                error: err.message,
+            });
+        }
+        callback({
+            data: rows,
+            message: "Danh sách danh mục theo trạng thái đã được lấy thành công",
+            success: true,
+            error: "",
+        });
+    });
+}
+
+static getListByTrash(trash, callback) {
+    db.query('SELECT * FROM category WHERE trash = ?', [trash], (err, rows) => {
+        if (err) {
+            return callback({
+                data: [],
+                message: "Không thể lấy danh sách danh mục theo trạng thái xoá",
+                success: false,
+                error: err.message,
+            });
+        }
+        callback({
+            data: rows,
+            message: "Danh sách danh mục theo trạng thái xoá đã được lấy thành công",
+            success: true,
+            error: "",
+        });
+    });
+}
 }
 
 module.exports = CategoryModel;
