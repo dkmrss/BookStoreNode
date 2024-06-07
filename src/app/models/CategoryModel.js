@@ -251,6 +251,7 @@ class CategoryModel {
         message: `Danh sách danh mục theo ${field} đã được lấy thành công`,
         success: true,
         error: "",
+        totalCount: rows.length
       });
     } catch (err) {
       callback({
@@ -258,6 +259,7 @@ class CategoryModel {
         message: `Không thể lấy danh sách danh mục theo ${field}`,
         success: false,
         error: err.message,
+        totalCount: 0
       });
     }
   }
@@ -269,6 +271,30 @@ class CategoryModel {
   static getListByTrash(trash, callback) {
     this.getListByField("trash", trash, callback);
   }
+
+  static async getListByFieldWithLimitOffset(field, value, limit, offset, callback) {
+  try {
+    const query = `SELECT * FROM category WHERE ${field} = ? LIMIT ? OFFSET ?`;
+    const rows = await this.executeQuery(query, [value, limit, offset]);
+    const countQuery = `SELECT COUNT(*) as totalCount FROM category WHERE ${field} = ?`;
+    const countResult = await this.executeQuery(countQuery, [value]);
+    callback({
+      data: rows,
+      message: `Danh sách danh mục theo ${field} đã được lấy thành công`,
+      success: true,
+      error: "",
+      totalCount: countResult[0].totalCount,
+    });
+  } catch (err) {
+    callback({
+      data: [],
+      message: `Không thể lấy danh sách danh mục theo ${field}`,
+      success: false,
+      error: err.message,
+      totalCount: 0,
+    });
+  }
+}
 }
 
 module.exports = CategoryModel;

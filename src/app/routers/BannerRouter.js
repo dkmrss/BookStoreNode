@@ -125,4 +125,33 @@ router.get("/trash/:trash", (req, res) => {
   });
 });
 
+router.get("/get-list-by-field", (req, res) => {
+  const { field, value, take, skip } = req.query;
+
+  if (!field || !value || !take || !skip) {
+    return res.status(400).json({
+      data: [],
+      message: "Thiếu thông tin trường hoặc giá trị, hoặc số lượng kết quả hoặc vị trí bắt đầu",
+      success: false,
+      error: "Missing field, value, take, or skip parameter",
+    });
+  }
+
+  const takeInt = parseInt(take);
+  const skipInt = parseInt(skip);
+
+  if (isNaN(takeInt) || isNaN(skipInt)) {
+    return res.status(400).json({
+      data: [],
+      message: "Số lượng kết quả hoặc vị trí bắt đầu không hợp lệ",
+      success: false,
+      error: "Invalid take or skip parameter",
+    });
+  }
+
+  BannerModel.getListByFieldWithLimitOffset(field, value, takeInt, skipInt, (result) => {
+    res.status(result.success ? 200 : 400).json(result);
+  });
+});
+
 module.exports = router;
