@@ -1,6 +1,7 @@
 const express = require("express");
 const UsersRouter = require("./UsersRouter"); // Đường dẫn đến UsersRouter
 const CategoryRouter = require("./CategoryRouter");
+const BannerRouter = require("./BannerRouter");
 
 const router = express.Router();
 
@@ -16,5 +17,8 @@ router.use("/users", UsersRouter);
 
 // Route cho danh mục
 router.use("/category", CategoryRouter);
+
+// Route cho banner
+router.use("/banner", BannerRouter);
 
 module.exports = router;
