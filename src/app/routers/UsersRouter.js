@@ -44,11 +44,13 @@ router.post('/users/create', upload.single('avatar'), (req, res) => {
 });
 
 // Route để cập nhật thông tin của một người dùng
-router.put("/users/update/:id", (req, res) => {
+router.put("/users/update/:id", upload.single('avatar'), (req, res) => {
   const userId = req.params.id;
   const updatedUser = req.body;
+  updatedUser.avatar = req.file ? req.file.path : ''; // Lưu đường dẫn của file ảnh vào trường avatar
+
   UserModel.update(userId, updatedUser, (result) => {
-    res.status(200).json(result);
+      res.status(200).json(result);
   });
 });
 
