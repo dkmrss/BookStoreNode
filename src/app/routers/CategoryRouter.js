@@ -42,9 +42,10 @@ router.post("/create", upload.single("illustration"), (req, res) => {
 });
 
 // Route để cập nhật thông tin
-router.put("/update/:id", (req, res) => {
+router.put("/update/:id", upload.single('illustration'), (req, res) => {
   const id = req.params.id;
   const updatedCategory = req.body;
+  updatedCategory.illustration = req.file ? req.file.path : '';
   CategoryModel.update(id, updatedCategory, (result) => {
     res.status(200).json(result);
   });
