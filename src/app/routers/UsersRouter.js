@@ -1,30 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/UsersModel");
-const multer = require('multer');
-
+const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, 'assets/avt/') // Thư mục để lưu trữ file ảnh
+    cb(null, "assets/avt/"); // Thư mục để lưu trữ file ảnh
   },
   filename: function (req, file, cb) {
-      cb(null, Date.now() + '-' + file.originalname); // Tên file sẽ được lưu trữ
-  }
+    cb(null, Date.now() + "-" + file.originalname); // Tên file sẽ được lưu trữ
+  },
 });
 
-const upload = multer({ storage: storage })
-
+const upload = multer({ storage: storage });
 
 // Route để lấy danh sách tất cả người dùng
-router.get("/users/get-lists", (req, res) => {
+router.get("/get-lists", (req, res) => {
   UserModel.getAll((result) => {
     res.status(200).json(result);
   });
 });
 
 // Route để lấy thông tin chi tiết của một người dùng
-router.get("/users/user-detail/:id", (req, res) => {
+router.get("/user-detail/:id", (req, res) => {
   const userId = req.params.id;
   UserModel.getById(userId, (result) => {
     res.status(200).json(result);
@@ -32,19 +30,19 @@ router.get("/users/user-detail/:id", (req, res) => {
 });
 
 // Route để tạo một người dùng mới
-router.post('/users/create', upload.single('avatar'), (req, res) => {
+router.post("/create", upload.single("avatar"), (req, res) => {
   const { email, password, name, phone, address } = req.body;
-    const avatar = req.file ? req.file.path : ''; // Lưu đường dẫn của file ảnh vào trường avatar
+  const avatar = req.file ? req.file.path : ""; // Lưu đường dẫn của file ảnh vào trường avatar
 
-    const newUser = { email, password, name, phone, address, avatar };
+  const newUser = { email, password, name, phone, address, avatar };
 
-    UserModel.create(newUser, (result) => {
-        res.json(result);
-    });
+  UserModel.create(newUser, (result) => {
+    res.json(result);
+  });
 });
 
 // Route để cập nhật thông tin của một người dùng
-router.put("/users/update/:id", (req, res) => {
+router.put("/update/:id", (req, res) => {
   const userId = req.params.id;
   const updatedUser = req.body;
   UserModel.update(userId, updatedUser, (result) => {
@@ -53,7 +51,7 @@ router.put("/users/update/:id", (req, res) => {
 });
 
 // Route để xóa một người dùng
-router.delete("/users/delete/:id", (req, res) => {
+router.delete("/delete/:id", (req, res) => {
   const userId = req.params.id;
   UserModel.delete(userId, (result) => {
     res.status(200).json(result);
@@ -61,7 +59,7 @@ router.delete("/users/delete/:id", (req, res) => {
 });
 
 // Route để lấy danh sách người dùng với giới hạn và lệch cho phân trang
-router.get("/users/get-list", (req, res) => {
+router.get("/get-list", (req, res) => {
   const take = parseInt(req.query.take);
   const skip = parseInt(req.query.skip);
 

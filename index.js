@@ -26,7 +26,7 @@ const connection = dbConnection;
 app.use("/api/v1/", require(__path_routers));
 
 // Phục vụ các tệp tĩnh từ thư mục "assets"
-app.use('/assets/avt', express.static(path.join(__dirname, 'assets', 'avt')));
+app.use("/assets/avt", express.static(path.join(__dirname, "assets", "avt")));
 
 app.use(function (req, res, next) {
   next(createError(404));
@@ -38,13 +38,16 @@ app.use(function (err, req, res, next) {
 
   // Lỗi 400 cho các yêu cầu không hợp lệ
   if (err.status === 400) {
-    res.status(400).json({ error: "Bad Request", message: err.message });
+    res.status(400).json({ error: "Lỗi kết nối", message: err.message });
   } else if (err.status === 404) {
-    res.status(404).json({ error: "Not Found", message: err.message });
+    res.status(404).json({ error: "Không tìm thấy", message: err.message });
   } else {
     // Các lỗi khác
     res.status(err.status || 500);
-    res.json({ error: err.message, message: "An unexpected error occurred" });
+    res.json({
+      error: err.message,
+      message: "Có lỗi xảy ra vui lòng liên hệ với các bên liên quan",
+    });
   }
 });
 
