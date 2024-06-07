@@ -104,44 +104,57 @@ class UserModel {
   }
 
   static update(id, updatedUser, callback) {
-    const { error } = userSchema.validate(updatedUser);
-    if (error) {
-      return callback({
-        data: [],
-        message: "Dữ liệu không hợp lệ",
-        success: false,
-        error: error.details[0].message,
-      });
-    }
-    db.query(
-      "UPDATE users SET ? WHERE id = ?",
-      [updatedUser, id],
-      (err, result) => {
+    // Lấy thông tin người dùng hiện tại
+    db.query('SELECT avatar FROM users WHERE id = ?', [id], (err, rows) => {
         if (err) {
-          return callback({
-            data: [],
-            message: "Không thể cập nhật thông tin người dùng",
-            success: false,
-            error: err.message,
-          });
+            return callback({
+                data: [],
+                message: "Không thể lấy thông tin người dùng",
+                success: false,
+                error: err.message,
+            });
         }
-        if (result.affectedRows === 0) {
-          return callback({
-            data: [],
-            message: "Không tìm thấy người dùng để cập nhật",
-            success: false,
-            error: "",
-          });
+        if (rows.length === 0) {
+            return callback({
+                data: [],
+                message: "Không tìm thấy người dùng",
+                success: false,
+                error: "",
+            });
         }
-        callback({
-          data: id,
-          message: "Thông tin người dùng đã được cập nhật thành công",
-          success: true,
-          error: "",
+        
+        // Giữ lại giá trị avatar hiện tại nếu không có tệp được tải lên
+        if (!updatedUser.avatar) {
+            updatedUser.avatar = rows[0].avatar;
+        }
+
+        db.query('UPDATE users SET ? WHERE id = ?', [updatedUser, id], (err, result) => {
+            if (err) {
+                return callback({
+                    data: [],
+                    message: "Không thể cập nhật thông tin người dùng",
+                    success: false,
+                    error: err.message,
+                });
+            }
+            if (result.affectedRows === 0) {
+                return callback({
+                    data: [],
+                    message: "Không tìm thấy người dùng để cập nhật",
+                    success: false,
+                    error: "",
+                });
+            }
+            callback({
+                data: id,
+                message: "Thông tin người dùng đã được cập nhật thành công",
+                success: true,
+                error: "",
+            });
         });
-      }
-    );
-  }
+    });
+}
+
 
   static delete(id, callback) {
     db.query("DELETE FROM users WHERE id = ?", [id], (err, result) => {

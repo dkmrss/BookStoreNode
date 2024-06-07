@@ -16,7 +16,7 @@ const upload = multer({ storage: storage });
 
 // Route để lấy danh sách tất cả
 router.get("/get-lists", (req, res) => {
-  CategoryModel.getAll((result) => {
+  CategoryModel.getList((result) => {
     res.status(200).json(result);
   });
 });
@@ -24,7 +24,7 @@ router.get("/get-lists", (req, res) => {
 // Route để lấy thông tin chi tiết
 router.get("/category-detail/:id", (req, res) => {
   const id = req.params.id;
-  CategoryModel.getById(id, (result) => {
+  CategoryModel.getDetail(id, (result) => {
     res.status(200).json(result);
   });
 });
@@ -45,7 +45,10 @@ router.post("/create", upload.single("illustration"), (req, res) => {
 router.put("/update/:id", upload.single('illustration'), (req, res) => {
   const id = req.params.id;
   const updatedCategory = req.body;
-  updatedCategory.illustration = req.file ? req.file.path : '';
+  if (req.file) {
+    updatedCategory.illustration = req.file.path; // Lưu đường dẫn của file ảnh vào trường avatar
+}
+  
   CategoryModel.update(id, updatedCategory, (result) => {
     res.status(200).json(result);
   });

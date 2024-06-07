@@ -33,23 +33,25 @@ router.get("/user-detail/:id", (req, res) => {
 router.post("/create", upload.single("avatar"), (req, res) => {
   const { email, password, name, phone, address } = req.body;
   const avatar = req.file ? req.file.path : ""; // Lưu đường dẫn của file ảnh vào trường avatar
-
   const newUser = { email, password, name, phone, address, avatar };
-
   UserModel.create(newUser, (result) => {
     res.json(result);
   });
 });
 
-// Route để cập nhật thông tin của một người dùng
-router.put("/users/update/:id", upload.single('avatar'), (req, res) => {
-  const userId = req.params.id;
-  const updatedUser = req.body;
-  updatedUser.avatar = req.file ? req.file.path : ''; // Lưu đường dẫn của file ảnh vào trường avatar
 
-  UserModel.update(userId, updatedUser, (result) => {
-      res.status(200).json(result);
-  });
+// Route để cập nhật thông tin của một người dùng
+router.put("/update/:id", upload.single('avatar'), (req, res) => {
+  const userId = req.params.id;
+    const updatedUser = req.body;
+
+    if (req.file) {
+        updatedUser.avatar = req.file.path; // Lưu đường dẫn của file ảnh vào trường avatar
+    }
+
+    UserModel.update(userId, updatedUser, (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+    });
 });
 
 // Route để xóa một người dùng

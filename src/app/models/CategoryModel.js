@@ -10,6 +10,7 @@ class CategoryModel {
           message: "Không thể lấy danh sách danh mục",
           success: false,
           error: err.message,
+          totalCount: 0
         });
       }
       callback({
@@ -17,6 +18,7 @@ class CategoryModel {
         message: "Danh sách danh mục đã được lấy thành công",
         success: true,
         error: "",
+        totalCount: rows.length
       });
     });
   }
@@ -50,7 +52,7 @@ class CategoryModel {
 
   static getListWithLimitOffset(limit, offset, callback) {
     const query = "SELECT * FROM category LIMIT ? OFFSET ?";
-    const countQuery = "SELECT COUNT(*) as totalCount FROM users";
+    const countQuery = "SELECT COUNT(*) as totalCount FROM category";
     db.query(query, [limit, offset], (err, rows) => {
       if (err) {
         return callback({
@@ -115,15 +117,15 @@ class CategoryModel {
   }
 
   static update(id, updatedCategory, callback) {
-    const { error } = categorySchema.validate(updatedCategory);
-    if (error) {
-      return callback({
-        data: [],
-        message: "Dữ liệu không hợp lệ",
-        success: false,
-        error: error.details[0].message,
-      });
-    }
+    // const { error } = categorySchema.validate(updatedCategory);
+    // if (error) {
+    //   return callback({
+    //     data: [],
+    //     message: "Dữ liệu không hợp lệ",
+    //     success: false,
+    //     error: error.details[0].message,
+    //   });
+    // }
     db.query(
       "UPDATE category SET ? WHERE id = ?",
       [updatedCategory, id],
@@ -153,6 +155,61 @@ class CategoryModel {
       }
     );
   }
+
+  static update(id, updatedCategory, callback) {
+
+    
+    // Lấy thông tin danh mục hiện tại
+    db.query('SELECT illustration FROM category WHERE id = ?', [id], (err, rows) => {
+        if (err) {
+            return callback({
+                data: [],
+                message: "Không thể lấy thông tin danh mục",
+                success: false,
+                error: err.message,
+            });
+        }
+        if (rows.length === 0) {
+            return callback({
+                data: [],
+                message: "Không tìm thấy danh mục",
+                success: false,
+                error: "",
+            });
+        }
+        
+        // Giữ lại giá trị avatar hiện tại nếu không có tệp được tải lên
+        if (!updatedCategory.illustration) {
+          updatedCategory.illustration = rows[0].illustration;
+        }
+
+        db.query('UPDATE category SET ? WHERE id = ?', [updatedCategory, id], (err, result) => {
+            if (err) {
+                return callback({
+                    data: [],
+                    message: "Không thể cập nhật danh mục",
+                    success: false,
+                    error: err.message,
+                });
+            }
+            if (result.affectedRows === 0) {
+                return callback({
+                    data: [],
+                    message: "Không tìm thấy danh mục dùng để cập nhật",
+                    success: false,
+                    error: "",
+                });
+            }
+            callback({
+                data: id,
+                message: "Thông tin danh mục đã được cập nhật thành công",
+                success: true,
+                error: "",
+            });
+        });
+    });
+}
+
 
   static delete(id, callback) {
     db.query("DELETE FROM category WHERE id = ?", [id], (err, result) => {
