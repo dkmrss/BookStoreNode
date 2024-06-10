@@ -22,7 +22,7 @@ router.get("/get-list", (req, res) => {
 });
 
 // Route để lấy thông tin chi tiết
-router.get("/category-detail/:id", (req, res) => {
+router.get("/banner-detail/:id", (req, res) => {
   const id = req.params.id;
   BannerModel.getDetail(id, (result) => {
     res.status(200).json(result);
