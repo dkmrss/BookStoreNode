@@ -39,7 +39,10 @@ class CategoryModel {
 
   static async getDetail(id, callback) {
     try {
-      const rows = await this.executeQuery("SELECT * FROM category WHERE id = ?", [id]);
+      const rows = await this.executeQuery(
+        "SELECT * FROM category WHERE id = ?",
+        [id]
+      );
       if (rows.length === 0) {
         return callback({
           data: {},
@@ -66,8 +69,13 @@ class CategoryModel {
 
   static async getListWithLimitOffset(limit, offset, callback) {
     try {
-      const rows = await this.executeQuery("SELECT * FROM category LIMIT ? OFFSET ?", [limit, offset]);
-      const countResult = await this.executeQuery("SELECT COUNT(*) as totalCount FROM category");
+      const rows = await this.executeQuery(
+        "SELECT * FROM category LIMIT ? OFFSET ?",
+        [limit, offset]
+      );
+      const countResult = await this.executeQuery(
+        "SELECT COUNT(*) as totalCount FROM category"
+      );
       callback({
         data: rows,
         message: "Danh sách danh mục đã được lấy thành công",
@@ -96,7 +104,13 @@ class CategoryModel {
     const { error } = categorySchema.validate(newCategory);
     if (error) {
       if (newCategory.illustration) {
-        const imagePath = path.join(__dirname, "..", "..", "..", newCategory.illustration);
+        const imagePath = path.join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          newCategory.illustration
+        );
         await this.handleImageDeletion(imagePath);
       }
       return callback({
@@ -107,7 +121,10 @@ class CategoryModel {
       });
     }
     try {
-      const result = await this.executeQuery("INSERT INTO category SET ?", newCategory);
+      const result = await this.executeQuery(
+        "INSERT INTO category SET ?",
+        newCategory
+      );
       callback({
         data: result.insertId,
         message: "Danh mục đã được thêm thành công",
@@ -116,7 +133,13 @@ class CategoryModel {
       });
     } catch (err) {
       if (newCategory.illustration) {
-        const imagePath = path.join(__dirname, "..", "..", "..", newCategory.illustration);
+        const imagePath = path.join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          newCategory.illustration
+        );
         await this.handleImageDeletion(imagePath);
       }
       callback({
@@ -130,10 +153,19 @@ class CategoryModel {
 
   static async update(id, updatedCategory, callback) {
     try {
-      const rows = await this.executeQuery("SELECT illustration FROM category WHERE id = ?", [id]);
+      const rows = await this.executeQuery(
+        "SELECT illustration FROM category WHERE id = ?",
+        [id]
+      );
       if (rows.length === 0) {
         if (updatedCategory.illustration) {
-          const imagePath = path.join(__dirname, "..", "..", "..", updatedCategory.illustration);
+          const imagePath = path.join(
+            __dirname,
+            "..",
+            "..",
+            "..",
+            updatedCategory.illustration
+          );
           await this.handleImageDeletion(imagePath);
         }
         return callback({
@@ -148,10 +180,19 @@ class CategoryModel {
         updatedCategory.illustration = rows[0].illustration;
       }
 
-      const result = await this.executeQuery("UPDATE category SET ? WHERE id = ?", [updatedCategory, id]);
+      const result = await this.executeQuery(
+        "UPDATE category SET ? WHERE id = ?",
+        [updatedCategory, id]
+      );
       if (result.affectedRows === 0) {
         if (updatedCategory.illustration) {
-          const imagePath = path.join(__dirname, "..", "..", "..", updatedCategory.illustration);
+          const imagePath = path.join(
+            __dirname,
+            "..",
+            "..",
+            "..",
+            updatedCategory.illustration
+          );
           await this.handleImageDeletion(imagePath);
         }
         return callback({
@@ -169,7 +210,13 @@ class CategoryModel {
       });
     } catch (err) {
       if (updatedCategory.illustration) {
-        const imagePath = path.join(__dirname, "..", "..", "..", updatedCategory.illustration);
+        const imagePath = path.join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          updatedCategory.illustration
+        );
         await this.handleImageDeletion(imagePath);
       }
       callback({
@@ -183,7 +230,10 @@ class CategoryModel {
 
   static async delete(id, callback) {
     try {
-      const result = await this.executeQuery("DELETE FROM category WHERE id = ?", [id]);
+      const result = await this.executeQuery(
+        "DELETE FROM category WHERE id = ?",
+        [id]
+      );
       if (result.affectedRows === 0) {
         return callback({
           data: [],
@@ -210,7 +260,10 @@ class CategoryModel {
 
   static async updateField(id, field, value, callback) {
     try {
-      const result = await this.executeQuery(`UPDATE category SET ${field} = ? WHERE id = ?`, [value, id]);
+      const result = await this.executeQuery(
+        `UPDATE category SET ${field} = ? WHERE id = ?`,
+        [value, id]
+      );
       if (result.affectedRows === 0) {
         return callback({
           data: [],
@@ -245,13 +298,16 @@ class CategoryModel {
 
   static async getListByField(field, value, callback) {
     try {
-      const rows = await this.executeQuery(`SELECT * FROM category WHERE ${field} = ?`, [value]);
+      const rows = await this.executeQuery(
+        `SELECT * FROM category WHERE ${field} = ?`,
+        [value]
+      );
       callback({
         data: rows,
         message: `Danh sách danh mục theo ${field} đã được lấy thành công`,
         success: true,
         error: "",
-        totalCount: rows.length
+        totalCount: rows.length,
       });
     } catch (err) {
       callback({
@@ -259,7 +315,7 @@ class CategoryModel {
         message: `Không thể lấy danh sách danh mục theo ${field}`,
         success: false,
         error: err.message,
-        totalCount: 0
+        totalCount: 0,
       });
     }
   }
@@ -272,29 +328,71 @@ class CategoryModel {
     this.getListByField("trash", trash, callback);
   }
 
-  static async getListByFieldWithLimitOffset(field, value, limit, offset, callback) {
-  try {
-    const query = `SELECT * FROM category WHERE ${field} = ? LIMIT ? OFFSET ?`;
-    const rows = await this.executeQuery(query, [value, limit, offset]);
-    const countQuery = `SELECT COUNT(*) as totalCount FROM category WHERE ${field} = ?`;
-    const countResult = await this.executeQuery(countQuery, [value]);
-    callback({
-      data: rows,
-      message: `Danh sách danh mục theo ${field} đã được lấy thành công`,
-      success: true,
-      error: "",
-      totalCount: countResult[0].totalCount,
-    });
-  } catch (err) {
-    callback({
-      data: [],
-      message: `Không thể lấy danh sách danh mục theo ${field}`,
-      success: false,
-      error: err.message,
-      totalCount: 0,
-    });
+  static async getListByFieldWithLimitOffset(
+    field,
+    value,
+    limit,
+    offset,
+    callback
+  ) {
+    try {
+      const query = `SELECT * FROM category WHERE ${field} = ? LIMIT ? OFFSET ?`;
+      const rows = await this.executeQuery(query, [value, limit, offset]);
+      const countQuery = `SELECT COUNT(*) as totalCount FROM category WHERE ${field} = ?`;
+      const countResult = await this.executeQuery(countQuery, [value]);
+      callback({
+        data: rows,
+        message: `Danh sách danh mục theo ${field} đã được lấy thành công`,
+        success: true,
+        error: "",
+        totalCount: countResult[0].totalCount,
+      });
+    } catch (err) {
+      callback({
+        data: [],
+        message: `Không thể lấy danh sách danh mục theo ${field}`,
+        success: false,
+        error: err.message,
+        totalCount: 0,
+      });
+    }
   }
-}
+
+  static async getListByFieldWithLimitOffset2(
+    value1,
+
+    value2,
+    limit,
+    offset,
+    callback
+  ) {
+    try {
+      const query = `SELECT * FROM category WHERE status = ? AND trash = ? LIMIT ? OFFSET ?`;
+      const rows = await this.executeQuery(query, [
+        value1,
+        value2,
+        limit,
+        offset,
+      ]);
+      const countQuery = `SELECT COUNT(*) as totalCount FROM category WHERE status = ? AND trash = ?`;
+      const countResult = await this.executeQuery(countQuery, [value1, value2]);
+      callback({
+        data: rows,
+        message: `Danh sách danh mục đã được lấy thành công`,
+        success: true,
+        error: "",
+        totalCount: countResult[0].totalCount,
+      });
+    } catch (err) {
+      callback({
+        data: [],
+        message: `Không thể lấy danh sách danh mục `,
+        success: false,
+        error: err.message,
+        totalCount: 0,
+      });
+    }
+  }
 }
 
 module.exports = CategoryModel;

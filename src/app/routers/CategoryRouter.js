@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Route để lấy danh sách tất cả
-router.get("/get-lists", (req, res) => {
+router.get("/get-list", (req, res) => {
   CategoryModel.getList((result) => {
     res.status(200).json(result);
   });
@@ -42,13 +42,13 @@ router.post("/create", upload.single("illustration"), (req, res) => {
 });
 
 // Route để cập nhật thông tin
-router.put("/update/:id", upload.single('illustration'), (req, res) => {
+router.put("/update/:id", upload.single("illustration"), (req, res) => {
   const id = req.params.id;
   const updatedCategory = req.body;
   if (req.file) {
     updatedCategory.illustration = req.file.path; // Lưu đường dẫn của file ảnh vào trường avatar
-}
-  
+  }
+
   CategoryModel.update(id, updatedCategory, (result) => {
     res.status(200).json(result);
   });
@@ -63,50 +63,82 @@ router.delete("/delete/:id", (req, res) => {
 });
 
 // Route để lấy danh sách với giới hạn và lệch cho phân trang
-router.get("/get-list", (req, res) => {
+router.get("/get-lists", (req, res) => {
   const take = parseInt(req.query.take);
   const skip = parseInt(req.query.skip);
+  const status = req.query.status;
+  const trash = req.query.trash;
+  if (status && trash) {
+    CategoryModel.getListByFieldWithLimitOffset2(
+      status,
+      trash,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
+  } else if (status && !trash) {
+    const field = "status";
+    CategoryModel.getListByFieldWithLimitOffset(
+      field,
+      status,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
+  } else if (!status && trash) {
+    const field = "trash";
+    CategoryModel.getListByFieldWithLimitOffset(
+      field,
+      trash,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
+  } else {
+    CategoryModel.getListWithLimitOffset(take, skip, (result) => {
+      res.status(200).json(result);
+    });
+  }
+});
+// Cập nhật status
+router.put("/status/:id", (req, res) => {
+  const id = req.params.id;
 
-  CategoryModel.getListWithLimitOffset(take, skip, (result) => {
-    res.status(200).json(result);
+  CategoryModel.getDetail(id, (result) => {
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+
+    // Chuyển đổi trạng thái
+    const newStatus = result.data.status === 0 ? 1 : 0;
+
+    CategoryModel.updateStatus(id, newStatus, (result) => {
+      res.status(result.success ? 200 : 400).json(result);
+    });
   });
 });
 
-// Cập nhật status 
-router.put("/status/:id", (req, res) => {
-  const id = req.params.id;
-    
-  CategoryModel.getDetail(id, (result) => {
-        if (!result.success) {
-            return res.status(404).json(result);
-        }
-
-        // Chuyển đổi trạng thái
-        const newStatus = result.data.status === 0 ? 1 : 0;
-
-        CategoryModel.updateStatus(id, newStatus, (result) => {
-            res.status(result.success ? 200 : 400).json(result);
-        });
-    });
-  
- 
-});
-
-// Cập nhật trash 
+// Cập nhật trash
 router.put("/trash/:id", (req, res) => {
   const id = req.params.id;
-    
-  CategoryModel.getDetail(id, (result) => {
-        if (!result.success) {
-            return res.status(404).json(result);
-        }
-        // Chuyển đổi trạng thái
-        const newStatus = result.data.trash === 0 ? 1 : 0;
 
-        CategoryModel.updateTrash(id, newStatus, (result) => {
-            res.status(result.success ? 200 : 400).json(result);
-        });
+  CategoryModel.getDetail(id, (result) => {
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+    // Chuyển đổi trạng thái
+    const newStatus = result.data.trash === 0 ? 1 : 0;
+
+    CategoryModel.updateTrash(id, newStatus, (result) => {
+      res.status(result.success ? 200 : 400).json(result);
     });
+  });
 });
 
 // Lấy danh sách theo status
@@ -114,7 +146,7 @@ router.get("/status/:status", (req, res) => {
   const status = req.params.status;
 
   CategoryModel.getListByStatus(status, (result) => {
-      res.status(result.success ? 200 : 400).json(result);
+    res.status(result.success ? 200 : 400).json(result);
   });
 });
 
@@ -123,7 +155,7 @@ router.get("/trash/:trash", (req, res) => {
   const trash = req.params.trash;
 
   CategoryModel.getListByTrash(trash, (result) => {
-      res.status(result.success ? 200 : 400).json(result);
+    res.status(result.success ? 200 : 400).json(result);
   });
 });
 
@@ -133,7 +165,8 @@ router.get("/get-list-by-field", (req, res) => {
   if (!field || !value || !take || !skip) {
     return res.status(400).json({
       data: [],
-      message: "Thiếu thông tin trường hoặc giá trị, hoặc số lượng kết quả hoặc vị trí bắt đầu",
+      message:
+        "Thiếu thông tin trường hoặc giá trị, hoặc số lượng kết quả hoặc vị trí bắt đầu",
       success: false,
       error: "Missing field, value, take, or skip parameter",
     });
@@ -151,9 +184,15 @@ router.get("/get-list-by-field", (req, res) => {
     });
   }
 
-  CategoryModel.getListByFieldWithLimitOffset(field, value, takeInt, skipInt, (result) => {
-    res.status(result.success ? 200 : 400).json(result);
-  });
+  CategoryModel.getListByFieldWithLimitOffset(
+    field,
+    value,
+    takeInt,
+    skipInt,
+    (result) => {
+      res.status(result.success ? 200 : 400).json(result);
+    }
+  );
 });
 
 module.exports = router;
