@@ -63,14 +63,6 @@ router.delete("/delete/:id", (req, res) => {
 });
 
 // Route để lấy danh sách với giới hạn và lệch cho phân trang
-router.get("/get-list", (req, res) => {
-  const take = parseInt(req.query.take);
-  const skip = parseInt(req.query.skip);
-
-  BannerModel.getListWithLimitOffset(take, skip, (result) => {
-    res.status(200).json(result);
-  });
-});
 
 // Cập nhật status
 router.put("/status/:id", (req, res) => {
@@ -125,33 +117,88 @@ router.get("/trash/:trash", (req, res) => {
   });
 });
 
-router.get("/get-list-by-field", (req, res) => {
-  const { field, value, take, skip } = req.query;
-
-  if (!field || !value || !take || !skip) {
-    return res.status(400).json({
-      data: [],
-      message: "Thiếu thông tin trường hoặc giá trị, hoặc số lượng kết quả hoặc vị trí bắt đầu",
-      success: false,
-      error: "Missing field, value, take, or skip parameter",
+router.get("/get-list", (req, res) => {
+  const take = parseInt(req.query.take);
+  const skip = parseInt(req.query.skip);
+  const status = parseInt(req.query.status);
+  const trash = parseInt(req.query.trash);
+  if (status && trash) {
+    const field1 = "status";
+    const field2 = "trash";
+    BannerModel.getListByFieldWithLimitOffset2(
+      field1,
+      status,
+      field2,
+      trash,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
+  } else if (status && !trash) {
+    const field = "status";
+    BannerModel.getListByFieldWithLimitOffset(
+      field,
+      status,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
+  } else if (!status && trash) {
+    const field = "trash";
+    BannerModel.getListByFieldWithLimitOffset(
+      field,
+      trash,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
+  } else {
+    BannerModel.getListWithLimitOffset(take, skip, (result) => {
+      res.status(200).json(result);
     });
   }
-
-  const takeInt = parseInt(take);
-  const skipInt = parseInt(skip);
-
-  if (isNaN(takeInt) || isNaN(skipInt)) {
-    return res.status(400).json({
-      data: [],
-      message: "Số lượng kết quả hoặc vị trí bắt đầu không hợp lệ",
-      success: false,
-      error: "Invalid take or skip parameter",
-    });
-  }
-
-  BannerModel.getListByFieldWithLimitOffset(field, value, takeInt, skipInt, (result) => {
-    res.status(result.success ? 200 : 400).json(result);
-  });
 });
+
+// router.get("/get-list-by-field", (req, res) => {
+//   const { field, value, take, skip } = req.query;
+
+//   if (!field || !value || !take || !skip) {
+//     return res.status(400).json({
+//       data: [],
+//       message:
+//         "Thiếu thông tin trường hoặc giá trị, hoặc số lượng kết quả hoặc vị trí bắt đầu",
+//       success: false,
+//       error: "Missing field, value, take, or skip parameter",
+//     });
+//   }
+
+//   const takeInt = parseInt(take);
+//   const skipInt = parseInt(skip);
+
+//   if (isNaN(takeInt) || isNaN(skipInt)) {
+//     return res.status(400).json({
+//       data: [],
+//       message: "Số lượng kết quả hoặc vị trí bắt đầu không hợp lệ",
+//       success: false,
+//       error: "Invalid take or skip parameter",
+//     });
+//   }
+
+//   BannerModel.getListByFieldWithLimitOffset(
+//     field,
+//     value,
+//     takeInt,
+//     skipInt,
+//     (result) => {
+//       res.status(result.success ? 200 : 400).json(result);
+//     }
+//   );
+// });
 
 module.exports = router;

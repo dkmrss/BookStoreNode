@@ -1,6 +1,6 @@
 const db = require("../configs/database");
 const bannerSchema = require("../schemas/BannerSchema");
-const fs = require('fs');
+const fs = require("fs");
 const path = require("path");
 
 class BannerModel {
@@ -45,7 +45,10 @@ class BannerModel {
 
   static async getDetail(id, callback) {
     try {
-      const rows = await this.executeQuery("SELECT * FROM banner WHERE id = ?", [id]);
+      const rows = await this.executeQuery(
+        "SELECT * FROM banner WHERE id = ?",
+        [id]
+      );
       if (rows.length === 0) {
         return callback({
           data: {},
@@ -72,8 +75,13 @@ class BannerModel {
 
   static async getListWithLimitOffset(limit, offset, callback) {
     try {
-      const rows = await this.executeQuery("SELECT * FROM banner LIMIT ? OFFSET ?", [limit, offset]);
-      const countResult = await this.executeQuery("SELECT COUNT(*) as totalCount FROM banner");
+      const rows = await this.executeQuery(
+        "SELECT * FROM banner LIMIT ? OFFSET ?",
+        [limit, offset]
+      );
+      const countResult = await this.executeQuery(
+        "SELECT COUNT(*) as totalCount FROM banner"
+      );
       callback({
         data: rows,
         message: "Danh sách banner đã được lấy thành công",
@@ -96,7 +104,13 @@ class BannerModel {
     const { error } = bannerSchema.validate(newBanner);
     if (error) {
       if (newBanner.image) {
-        const imagePath = path.join(__dirname, '..', '..', '..', newBanner.image);
+        const imagePath = path.join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          newBanner.image
+        );
         await this.handleImageDeletion(imagePath);
       }
       return callback({
@@ -107,7 +121,10 @@ class BannerModel {
       });
     }
     try {
-      const result = await this.executeQuery("INSERT INTO banner SET ?", newBanner);
+      const result = await this.executeQuery(
+        "INSERT INTO banner SET ?",
+        newBanner
+      );
       callback({
         data: result.insertId,
         message: "Banner đã được thêm thành công",
@@ -116,7 +133,13 @@ class BannerModel {
       });
     } catch (err) {
       if (newBanner.image) {
-        const imagePath = path.join(__dirname, '..', '..', '..', newBanner.image);
+        const imagePath = path.join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          newBanner.image
+        );
         await this.handleImageDeletion(imagePath);
       }
       callback({
@@ -130,10 +153,19 @@ class BannerModel {
 
   static async update(id, updatedBanner, callback) {
     try {
-      const rows = await this.executeQuery("SELECT image FROM banner WHERE id = ?", [id]);
+      const rows = await this.executeQuery(
+        "SELECT image FROM banner WHERE id = ?",
+        [id]
+      );
       if (rows.length === 0) {
         if (updatedBanner.image) {
-          const imagePath = path.join(__dirname, '..', '..', '..', updatedBanner.image);
+          const imagePath = path.join(
+            __dirname,
+            "..",
+            "..",
+            "..",
+            updatedBanner.image
+          );
           await this.handleImageDeletion(imagePath);
         }
         return callback({
@@ -148,10 +180,19 @@ class BannerModel {
         updatedBanner.image = rows[0].image;
       }
 
-      const result = await this.executeQuery("UPDATE banner SET ? WHERE id = ?", [updatedBanner, id]);
+      const result = await this.executeQuery(
+        "UPDATE banner SET ? WHERE id = ?",
+        [updatedBanner, id]
+      );
       if (result.affectedRows === 0) {
         if (updatedBanner.image) {
-          const imagePath = path.join(__dirname, '..', '..', '..', updatedBanner.image);
+          const imagePath = path.join(
+            __dirname,
+            "..",
+            "..",
+            "..",
+            updatedBanner.image
+          );
           await this.handleImageDeletion(imagePath);
         }
         return callback({
@@ -169,7 +210,13 @@ class BannerModel {
       });
     } catch (err) {
       if (updatedBanner.image) {
-        const imagePath = path.join(__dirname, '..', '..', '..', updatedBanner.image);
+        const imagePath = path.join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          updatedBanner.image
+        );
         await this.handleImageDeletion(imagePath);
       }
       callback({
@@ -183,7 +230,10 @@ class BannerModel {
 
   static async delete(id, callback) {
     try {
-      const result = await this.executeQuery("DELETE FROM banner WHERE id = ?", [id]);
+      const result = await this.executeQuery(
+        "DELETE FROM banner WHERE id = ?",
+        [id]
+      );
       if (result.affectedRows === 0) {
         return callback({
           data: [],
@@ -210,7 +260,10 @@ class BannerModel {
 
   static async updateField(id, field, value, callback) {
     try {
-      const result = await this.executeQuery(`UPDATE banner SET ${field} = ? WHERE id = ?`, [value, id]);
+      const result = await this.executeQuery(
+        `UPDATE banner SET ${field} = ? WHERE id = ?`,
+        [value, id]
+      );
       if (result.affectedRows === 0) {
         return callback({
           data: [],
@@ -245,13 +298,16 @@ class BannerModel {
 
   static async getListByField(field, value, callback) {
     try {
-      const rows = await this.executeQuery(`SELECT * FROM banner WHERE ${field} = ?`, [value]);
+      const rows = await this.executeQuery(
+        `SELECT * FROM banner WHERE ${field} = ?`,
+        [value]
+      );
       callback({
         data: rows,
         message: `Danh sách banner theo ${field} đã được lấy thành công`,
         success: true,
         error: "",
-        totalCount: rows.length
+        totalCount: rows.length,
       });
     } catch (err) {
       callback({
@@ -259,7 +315,7 @@ class BannerModel {
         message: `Không thể lấy danh sách banner theo ${field}`,
         success: false,
         error: err.message,
-        totalCount: 0
+        totalCount: 0,
       });
     }
   }
@@ -272,7 +328,13 @@ class BannerModel {
     this.getListByField("trash", trash, callback);
   }
 
-  static async getListByFieldWithLimitOffset(field, value, limit, offset, callback) {
+  static async getListByFieldWithLimitOffset(
+    field,
+    value,
+    limit,
+    offset,
+    callback
+  ) {
     try {
       const query = `SELECT * FROM banner WHERE ${field} = ? LIMIT ? OFFSET ?`;
       const rows = await this.executeQuery(query, [value, limit, offset]);
@@ -289,6 +351,43 @@ class BannerModel {
       callback({
         data: [],
         message: `Không thể lấy danh sách banner theo ${field}`,
+        success: false,
+        error: err.message,
+        totalCount: 0,
+      });
+    }
+  }
+
+  static async getListByFieldWithLimitOffset2(
+    field1,
+    value1,
+    field2,
+    value2,
+    limit,
+    offset,
+    callback
+  ) {
+    try {
+      const query = `SELECT * FROM banner WHERE ${field1} = ? AND  ${field2} = ? LIMIT ? OFFSET ?`;
+      const rows = await this.executeQuery(query, [
+        value1,
+        value2,
+        limit,
+        offset,
+      ]);
+      const countQuery = `SELECT COUNT(*) as totalCount FROM banner WHERE ${field1} = ? AND ${field2} = ?`;
+      const countResult = await this.executeQuery(countQuery, [value1, value2]);
+      callback({
+        data: rows,
+        message: `Danh sách banner đã được lấy thành công`,
+        success: true,
+        error: "",
+        totalCount: countResult[0].totalCount,
+      });
+    } catch (err) {
+      callback({
+        data: [],
+        message: `Không thể lấy danh sách banner `,
         success: false,
         error: err.message,
         totalCount: 0,
