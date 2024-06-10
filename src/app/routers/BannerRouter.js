@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Route để lấy danh sách tất cả
-router.get("/get-lists", (req, res) => {
+router.get("/get-list", (req, res) => {
   BannerModel.getList((result) => {
     res.status(200).json(result);
   });
@@ -117,18 +117,14 @@ router.get("/trash/:trash", (req, res) => {
   });
 });
 
-router.get("/get-list", (req, res) => {
+router.get("/get-lists", (req, res) => {
   const take = parseInt(req.query.take);
   const skip = parseInt(req.query.skip);
-  const status = parseInt(req.query.status);
-  const trash = parseInt(req.query.trash);
+  const status = req.query.status;
+  const trash = req.query.trash;
   if (status && trash) {
-    const field1 = "status";
-    const field2 = "trash";
     BannerModel.getListByFieldWithLimitOffset2(
-      field1,
       status,
-      field2,
       trash,
       take,
       skip,

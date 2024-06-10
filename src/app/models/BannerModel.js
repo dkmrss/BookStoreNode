@@ -359,23 +359,23 @@ class BannerModel {
   }
 
   static async getListByFieldWithLimitOffset2(
-    field1,
+    
     value1,
-    field2,
+   
     value2,
     limit,
     offset,
     callback
   ) {
     try {
-      const query = `SELECT * FROM banner WHERE ${field1} = ? AND  ${field2} = ? LIMIT ? OFFSET ?`;
+      const query = `SELECT * FROM banner WHERE status = ? AND trash = ? LIMIT ? OFFSET ?`;
       const rows = await this.executeQuery(query, [
         value1,
         value2,
         limit,
         offset,
       ]);
-      const countQuery = `SELECT COUNT(*) as totalCount FROM banner WHERE ${field1} = ? AND ${field2} = ?`;
+      const countQuery = `SELECT COUNT(*) as totalCount FROM banner WHERE status = ? AND trash = ?`;
       const countResult = await this.executeQuery(countQuery, [value1, value2]);
       callback({
         data: rows,
