@@ -110,7 +110,7 @@ router.get("/get-lists", (req, res) => {
 router.put("/types/:id", (req, res) => {
   const id = req.params.id;
 
-  BannerModel.getDetail(id, (result) => {
+  BookInfoModel.getDetail(id, (result) => {
     if (!result.success) {
       return res.status(404).json(result);
     }
@@ -118,7 +118,7 @@ router.put("/types/:id", (req, res) => {
     // Chuyển đổi trạng thái
     const newType = result.data.status === "cover" ? "read" : "cover";
 
-    BannerModel.updateStatus(id, newType, (result) => {
+    BookInfoModel.updateStatus(id, newType, (result) => {
       res.status(result.success ? 200 : 400).json(result);
     });
   });
