@@ -66,9 +66,33 @@ router.delete("/delete/:id", (req, res) => {
 router.get("/get-lists", (req, res) => {
   const take = parseInt(req.query.take);
   const skip = parseInt(req.query.skip);
+  const types = req.query.types;
   const trash = req.query.trash;
-  if (trash) {
+  if (types && trash) {
     BookInfoModel.getListByFieldWithLimitOffset2(
+      trash,
+      types,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
+  } else if (types && !trash) {
+    const field = "types";
+    BookInfoModel.getListByFieldWithLimitOffset(
+      field,
+      types,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
+  } else if (!types && trash) {
+    const field = "trash";
+    BookInfoModel.getListByFieldWithLimitOffset(
+      field,
       trash,
       take,
       skip,
@@ -82,7 +106,23 @@ router.get("/get-lists", (req, res) => {
     });
   }
 });
+//cập nhật types
+router.put("/types/:id", (req, res) => {
+  const id = req.params.id;
 
+  BannerModel.getDetail(id, (result) => {
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+
+    // Chuyển đổi trạng thái
+    const newType = result.data.status === "cover" ? "read" : "cover";
+
+    BannerModel.updateStatus(id, newType, (result) => {
+      res.status(result.success ? 200 : 400).json(result);
+    });
+  });
+});
 // Cập nhật trash
 router.put("/trash/:id", (req, res) => {
   const id = req.params.id;

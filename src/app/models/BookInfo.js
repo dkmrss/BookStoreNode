@@ -21,7 +21,7 @@ class BookInfoModel {
       const rows = await this.executeQuery("SELECT * FROM book_info");
       callback({
         data: rows,
-        message: "Danh sách danh mục đã được lấy thành công",
+        message: "Danh sách thông tin sách đã được lấy thành công",
         success: true,
         error: "",
         totalCount: rows.length,
@@ -29,7 +29,7 @@ class BookInfoModel {
     } catch (err) {
       callback({
         data: [],
-        message: "Không thể lấy danh sách danh mục",
+        message: "Không thể lấy danh sách thông tin sách",
         success: false,
         error: err.message,
         totalCount: 0,
@@ -46,21 +46,21 @@ class BookInfoModel {
       if (rows.length === 0) {
         return callback({
           data: {},
-          message: "Không tìm thấy danh mục",
+          message: "Không tìm thấy thông tin sách",
           success: false,
           error: "",
         });
       }
       callback({
         data: rows[0],
-        message: "Thông tin danh mục đã được lấy thành công",
+        message: "Thông tin thông tin sách đã được lấy thành công",
         success: true,
         error: "",
       });
     } catch (err) {
       callback({
         data: {},
-        message: "Không thể lấy thông tin danh mục",
+        message: "Không thể lấy thông tin thông tin sách",
         success: false,
         error: err.message,
       });
@@ -78,7 +78,7 @@ class BookInfoModel {
       );
       callback({
         data: rows,
-        message: "Danh sách danh mục đã được lấy thành công",
+        message: "Danh sách thông tin sách đã được lấy thành công",
         success: true,
         error: "",
         totalCount: countResult[0].totalCount,
@@ -86,7 +86,7 @@ class BookInfoModel {
     } catch (err) {
       callback({
         data: [],
-        message: "Không thể lấy danh sách danh mục",
+        message: "Không thể lấy danh sách thông tin sách",
         success: false,
         error: err.message,
         totalCount: 0,
@@ -127,7 +127,7 @@ class BookInfoModel {
       );
       callback({
         data: result.insertId,
-        message: "Danh mục đã được thêm thành công",
+        message: "thông tin sách đã được thêm thành công",
         success: true,
         error: "",
       });
@@ -144,7 +144,7 @@ class BookInfoModel {
       }
       callback({
         data: [],
-        message: "Không thể thêm danh mục",
+        message: "Không thể thêm thông tin sách",
         success: false,
         error: err.message,
       });
@@ -170,7 +170,7 @@ class BookInfoModel {
         }
         return callback({
           data: [],
-          message: "Không tìm thấy danh mục",
+          message: "Không tìm thấy thông tin sách",
           success: false,
           error: "",
         });
@@ -197,14 +197,14 @@ class BookInfoModel {
         }
         return callback({
           data: [],
-          message: "Không tìm thấy danh mục dùng để cập nhật",
+          message: "Không tìm thấy thông tin sách dùng để cập nhật",
           success: false,
           error: "",
         });
       }
       callback({
         data: id,
-        message: "Thông tin danh mục đã được cập nhật thành công",
+        message: "Thông tin thông tin sách đã được cập nhật thành công",
         success: true,
         error: "",
       });
@@ -221,7 +221,7 @@ class BookInfoModel {
       }
       callback({
         data: [],
-        message: "Không thể cập nhật danh mục",
+        message: "Không thể cập nhật thông tin sách",
         success: false,
         error: err.message,
       });
@@ -237,21 +237,21 @@ class BookInfoModel {
       if (result.affectedRows === 0) {
         return callback({
           data: [],
-          message: "Không tìm thấy danh mục để xóa",
+          message: "Không tìm thấy thông tin sách để xóa",
           success: false,
           error: "",
         });
       }
       callback({
         data: id,
-        message: "Danh mục đã được xóa thành công",
+        message: "thông tin sách đã được xóa thành công",
         success: true,
         error: "",
       });
     } catch (err) {
       callback({
         data: [],
-        message: "Không thể xóa danh mục",
+        message: "Không thể xóa thông tin sách",
         success: false,
         error: err.message,
       });
@@ -267,29 +267,29 @@ class BookInfoModel {
       if (result.affectedRows === 0) {
         return callback({
           data: [],
-          message: `Không tìm thấy danh mục để cập nhật ${field}`,
+          message: `Không tìm thấy thông tin sách để cập nhật ${field}`,
           success: false,
           error: "",
         });
       }
       callback({
         data: id,
-        message: `Trạng thái ${field} của danh mục đã được cập nhật thành công`,
+        message: `Trạng thái ${field} của thông tin sách đã được cập nhật thành công`,
         success: true,
         error: "",
       });
     } catch (err) {
       callback({
         data: [],
-        message: `Không thể cập nhật ${field} của danh mục`,
+        message: `Không thể cập nhật ${field} của thông tin sách`,
         success: false,
         error: err.message,
       });
     }
   }
 
-  static updateStatus(id, status, callback) {
-    this.updateField(id, "status", status, callback);
+  static updateType(id, types, callback) {
+    this.updateField(id, "types", types, callback);
   }
 
   static updateTrash(id, trash, callback) {
@@ -304,7 +304,7 @@ class BookInfoModel {
       );
       callback({
         data: rows,
-        message: `Danh sách danh mục theo ${field} đã được lấy thành công`,
+        message: `Danh sách thông tin sách theo ${field} đã được lấy thành công`,
         success: true,
         error: "",
         totalCount: rows.length,
@@ -312,7 +312,7 @@ class BookInfoModel {
     } catch (err) {
       callback({
         data: [],
-        message: `Không thể lấy danh sách danh mục theo ${field}`,
+        message: `Không thể lấy danh sách thông tin sách theo ${field}`,
         success: false,
         error: err.message,
         totalCount: 0,
@@ -342,7 +342,7 @@ class BookInfoModel {
       const countResult = await this.executeQuery(countQuery, [value]);
       callback({
         data: rows,
-        message: `Danh sách danh mục theo ${field} đã được lấy thành công`,
+        message: `Danh sách thông tin sách theo ${field} đã được lấy thành công`,
         success: true,
         error: "",
         totalCount: countResult[0].totalCount,
@@ -350,7 +350,7 @@ class BookInfoModel {
     } catch (err) {
       callback({
         data: [],
-        message: `Không thể lấy danh sách danh mục theo ${field}`,
+        message: `Không thể lấy danh sách thông tin sách theo ${field}`,
         success: false,
         error: err.message,
         totalCount: 0,
@@ -358,15 +358,26 @@ class BookInfoModel {
     }
   }
 
-  static async getListByFieldWithLimitOffset2(value, limit, offset, callback) {
+  static async getListByFieldWithLimitOffset2(
+    value,
+    value2,
+    limit,
+    offset,
+    callback
+  ) {
     try {
-      const query = `SELECT * FROM book_info WHERE trash = ? LIMIT ? OFFSET ?`;
-      const rows = await this.executeQuery(query, [value, limit, offset]);
+      const query = `SELECT * FROM book_info WHERE trash = ?  AND types = ? LIMIT ? OFFSET ?`;
+      const rows = await this.executeQuery(query, [
+        value,
+        value2,
+        limit,
+        offset,
+      ]);
       const countQuery = `SELECT COUNT(*) as totalCount FROM book_info WHERE trash = ?`;
-      const countResult = await this.executeQuery(countQuery, [value]);
+      const countResult = await this.executeQuery(countQuery, [value, value2]);
       callback({
         data: rows,
-        message: `Danh sách danh mục đã được lấy thành công`,
+        message: `Danh sách thông tin sách đã được lấy thành công`,
         success: true,
         error: "",
         totalCount: countResult[0].totalCount,
@@ -374,7 +385,7 @@ class BookInfoModel {
     } catch (err) {
       callback({
         data: [],
-        message: `Không thể lấy danh sách danh mục `,
+        message: `Không thể lấy danh sách thông tin sách `,
         success: false,
         error: err.message,
         totalCount: 0,
