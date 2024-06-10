@@ -36,6 +36,10 @@ app.use(
   express.static(path.join(__dirname, "assets", "Category"))
 );
 app.use("/assets/News", express.static(path.join(__dirname, "assets", "News")));
+app.use(
+  "/assets/BookInfo",
+  express.static(path.join(__dirname, "assets", "BookInfo"))
+);
 
 app.use(function (req, res, next) {
   next(createError(404));

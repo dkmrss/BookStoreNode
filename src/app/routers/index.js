@@ -3,6 +3,7 @@ const UsersRouter = require("./UsersRouter"); // Đường dẫn đến UsersRou
 const CategoryRouter = require("./CategoryRouter");
 const BannerRouter = require("./BannerRouter");
 const NewRouter = require("./NewRouter");
+const BookInfoRouter = require("./BookInfoRouter");
 
 const router = express.Router();
 
@@ -24,5 +25,8 @@ router.use("/banner", BannerRouter);
 
 // Route cho bài viết
 router.use("/new", NewRouter);
+
+// Route cho ảnh thêm sách
+router.use("/bookInfo", BookInfoRouter);
 
 module.exports = router;
