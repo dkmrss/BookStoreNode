@@ -27,6 +27,15 @@ app.use("/api/v1/", require(__path_routers));
 
 // Phục vụ các tệp tĩnh từ thư mục "assets"
 app.use("/assets/avt", express.static(path.join(__dirname, "assets", "avt")));
+app.use(
+  "/assets/Banner",
+  express.static(path.join(__dirname, "assets", "Banner"))
+);
+app.use(
+  "/assets/Category",
+  express.static(path.join(__dirname, "assets", "Category"))
+);
+app.use("/assets/News", express.static(path.join(__dirname, "assets", "News")));
 
 app.use(function (req, res, next) {
   next(createError(404));
