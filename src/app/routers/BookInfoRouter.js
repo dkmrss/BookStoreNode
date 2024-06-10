@@ -118,7 +118,7 @@ router.put("/types/:id", (req, res) => {
     // Chuyển đổi trạng thái
     const newType = result.data.status === "cover" ? "read" : "cover";
 
-    BookInfoModel.updateStatus(id, newType, (result) => {
+    BookInfoModel.updateType(id, newType, (result) => {
       res.status(result.success ? 200 : 400).json(result);
     });
   });
