@@ -10,7 +10,7 @@ router.get("/get-list", (req, res) => {
 });
 
 // Route để lấy thông tin chi tiết của một bình luận của người dùng
-router.get("/comment-detail/:id", (req, res) => {
+router.get("/order-detail/:id", (req, res) => {
   const id = req.params.id;
   UserCommentModel.getById(id, (result) => {
     res.status(200).json(result);
@@ -42,16 +42,7 @@ router.delete("/delete/:id", (req, res) => {
   });
 });
 
-// Route để lấy danh sách bình luận của người dùng với giới hạn và lệch cho phân trang
-router.get("/get-list", (req, res) => {
-  const take = parseInt(req.query.take);
-  const skip = parseInt(req.query.skip);
-
-  UserCommentModel.getListWithLimitOffset(take, skip, (result) => {
-    res.status(200).json(result);
-  });
-});
-
+//lấy theo trường
 router.get("/get-list-by-field", (req, res) => {
   const { field, value, take, skip } = req.query;
 
@@ -88,29 +79,54 @@ router.get("/get-list-by-field", (req, res) => {
   );
 });
 
+//phân trang, lấy theo trường
 router.get("/get-lists", (req, res) => {
   const take = parseInt(req.query.take);
   const skip = parseInt(req.query.skip);
-  const bookId = req.query.bookId;
-  const userId = req.query.userId;
+  const delivered = req.query.delivered;
+  const method = req.query.method;
+  const payment = req.query.payment;
+  const customer_id = req.query.customer_id;
+  const phone = req.query.phone;
 
   const fields = [];
   const values = [];
 
-  if (bookId) {
-    fields.push("book_id");
-    values.push(bookId);
+  if (phone) {
+    fields.push("phone");
+    values.push(phone);
   }
 
-  if (userId) {
-    fields.push("user_id");
-    values.push(userId);
+  if (delivered) {
+    fields.push("delivered");
+    values.push(delivered);
+  }
+
+  if (method) {
+    fields.push("method");
+    values.push(method);
+  }
+
+  if (payment) {
+    fields.push("payment");
+    values.push(payment);
+  }
+
+  if (customer_id) {
+    fields.push("customer_id");
+    values.push(customer_id);
   }
 
   if (fields.length > 0) {
-    UserCommentModel.getListWithLimitOffsetByFields(fields, values, take, skip, (result) => {
-      res.status(result.success ? 200 : 400).json(result);
-    });
+    UserCommentModel.getListWithLimitOffsetByFields(
+      fields,
+      values,
+      take,
+      skip,
+      (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+      }
+    );
   } else {
     UserCommentModel.getListWithLimitOffset(take, skip, (result) => {
       res.status(200).json(result);

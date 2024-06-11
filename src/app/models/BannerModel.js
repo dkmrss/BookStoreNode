@@ -358,41 +358,57 @@ class BannerModel {
     }
   }
 
-  static async getListByFieldWithLimitOffset2(
-    
-    value1,
-   
-    value2,
+  static getListWithLimitOffsetByFields(
+    fields,
+    values,
     limit,
     offset,
     callback
   ) {
-    try {
-      const query = `SELECT * FROM banner WHERE status = ? AND trash = ? LIMIT ? OFFSET ?`;
-      const rows = await this.executeQuery(query, [
-        value1,
-        value2,
-        limit,
-        offset,
-      ]);
-      const countQuery = `SELECT COUNT(*) as totalCount FROM banner WHERE status = ? AND trash = ?`;
-      const countResult = await this.executeQuery(countQuery, [value1, value2]);
-      callback({
-        data: rows,
-        message: `Danh sách banner đã được lấy thành công`,
-        success: true,
-        error: "",
-        totalCount: countResult[0].totalCount,
-      });
-    } catch (err) {
-      callback({
+    if (fields.length !== values.length) {
+      return callback({
         data: [],
-        message: `Không thể lấy danh sách banner `,
+        message: "Số lượng fields và values không khớp",
         success: false,
-        error: err.message,
-        totalCount: 0,
+        error: "Invalid input",
       });
     }
+
+    const whereClauses = fields.map((field) => `${field} = ?`).join(" AND ");
+    const query = `SELECT * FROM banner WHERE ${whereClauses} LIMIT ? OFFSET ?`;
+    const countQuery = `SELECT COUNT(*) as totalCount FROM banner WHERE ${whereClauses}`;
+
+    const queryParams = [...values, limit, offset];
+    const countParams = values;
+
+    db.query(query, queryParams, (err, rows) => {
+      if (err) {
+        return callback({
+          data: [],
+          message: "Không thể lấy danh sách banner",
+          success: false,
+          error: err.message,
+        });
+      }
+      db.query(countQuery, countParams, (err, countResult) => {
+        if (err) {
+          return callback({
+            data: [],
+            message: "Không thể đếm số lượng banner",
+            success: false,
+            error: err.message,
+          });
+        }
+        const totalCount = countResult[0].totalCount;
+        callback({
+          data: rows,
+          message: "Danh sách banner đã được lấy thành công",
+          success: true,
+          error: "",
+          totalCount: totalCount,
+        });
+      });
+    });
   }
 }
 

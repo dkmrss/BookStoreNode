@@ -68,32 +68,24 @@ router.get("/get-lists", (req, res) => {
   const skip = parseInt(req.query.skip);
   const status = req.query.status;
   const trash = req.query.trash;
-  if (status && trash) {
-    CategoryModel.getListByFieldWithLimitOffset2(
-      status,
-      trash,
-      take,
-      skip,
-      (result) => {
-        res.status(result.success ? 200 : 400).json(result);
-      }
-    );
-  } else if (status && !trash) {
-    const field = "status";
-    CategoryModel.getListByFieldWithLimitOffset(
-      field,
-      status,
-      take,
-      skip,
-      (result) => {
-        res.status(result.success ? 200 : 400).json(result);
-      }
-    );
-  } else if (!status && trash) {
-    const field = "trash";
-    CategoryModel.getListByFieldWithLimitOffset(
-      field,
-      trash,
+
+  const fields = [];
+  const values = [];
+
+  if (status) {
+    fields.push("status");
+    values.push(status);
+  }
+
+  if (trash) {
+    fields.push("trash");
+    values.push(trash);
+  }
+
+  if (fields.length > 0) {
+    CategoryModel.getListWithLimitOffsetByFields(
+      fields,
+      values,
       take,
       skip,
       (result) => {

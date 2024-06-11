@@ -68,38 +68,24 @@ router.get("/get-lists", (req, res) => {
   const skip = parseInt(req.query.skip);
   const types = req.query.types;
   const trash = req.query.trash;
-  if (types && trash) {
-    BookInfoModel.getListByFieldWithLimitOffset2(
-      trash,
-      types,
-      take,
-      skip,
-      (result) => {
-        res.status(result.success ? 200 : 400).json(result);
-      }
-    );
-  } else if (types && !trash) {
-    const field = "types";
-    BookInfoModel.getListByFieldWithLimitOffset(
-      field,
-      types,
-      take,
-      skip,
-      (result) => {
-        res.status(result.success ? 200 : 400).json(result);
-      }
-    );
-  } else if (!types && trash) {
-    const field = "trash";
-    BookInfoModel.getListByFieldWithLimitOffset(
-      field,
-      trash,
-      take,
-      skip,
-      (result) => {
-        res.status(result.success ? 200 : 400).json(result);
-      }
-    );
+
+  const fields = [];
+  const values = [];
+
+  if (types) {
+    fields.push("types");
+    values.push(types);
+  }
+
+  if (trash) {
+    fields.push("trash");
+    values.push(trash);
+  }
+
+  if (fields.length > 0) {
+    BookInfoModel.getListWithLimitOffsetByFields(fields, values, take, skip, (result) => {
+      res.status(result.success ? 200 : 400).json(result);
+    });
   } else {
     BookInfoModel.getListWithLimitOffset(take, skip, (result) => {
       res.status(200).json(result);

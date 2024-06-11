@@ -358,39 +358,57 @@ class BookInfoModel {
     }
   }
 
-  static async getListByFieldWithLimitOffset2(
-    value,
-    value2,
+  static getListWithLimitOffsetByFields(
+    fields,
+    values,
     limit,
     offset,
     callback
   ) {
-    try {
-      const query = `SELECT * FROM book_info WHERE trash = ?  AND types = ? LIMIT ? OFFSET ?`;
-      const rows = await this.executeQuery(query, [
-        value,
-        value2,
-        limit,
-        offset,
-      ]);
-      const countQuery = `SELECT COUNT(*) as totalCount FROM book_info WHERE trash = ?`;
-      const countResult = await this.executeQuery(countQuery, [value, value2]);
-      callback({
-        data: rows,
-        message: `Danh sách thông tin sách đã được lấy thành công`,
-        success: true,
-        error: "",
-        totalCount: countResult[0].totalCount,
-      });
-    } catch (err) {
-      callback({
+    if (fields.length !== values.length) {
+      return callback({
         data: [],
-        message: `Không thể lấy danh sách thông tin sách `,
+        message: "Số lượng fields và values không khớp",
         success: false,
-        error: err.message,
-        totalCount: 0,
+        error: "Invalid input",
       });
     }
+
+    const whereClauses = fields.map((field) => `${field} = ?`).join(" AND ");
+    const query = `SELECT * FROM book_info WHERE ${whereClauses} LIMIT ? OFFSET ?`;
+    const countQuery = `SELECT COUNT(*) as totalCount FROM book_info WHERE ${whereClauses}`;
+
+    const queryParams = [...values, limit, offset];
+    const countParams = values;
+
+    db.query(query, queryParams, (err, rows) => {
+      if (err) {
+        return callback({
+          data: [],
+          message: "Không thể lấy danh sách thông tin sách",
+          success: false,
+          error: err.message,
+        });
+      }
+      db.query(countQuery, countParams, (err, countResult) => {
+        if (err) {
+          return callback({
+            data: [],
+            message: "Không thể đếm số lượng thông tin sách",
+            success: false,
+            error: err.message,
+          });
+        }
+        const totalCount = countResult[0].totalCount;
+        callback({
+          data: rows,
+          message: "Danh sách thông tin sách đã được lấy thành công",
+          success: true,
+          error: "",
+          totalCount: totalCount,
+        });
+      });
+    });
   }
 }
 

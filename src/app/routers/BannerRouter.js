@@ -117,45 +117,32 @@ router.get("/trash/:trash", (req, res) => {
   });
 });
 
+
 router.get("/get-lists", (req, res) => {
   const take = parseInt(req.query.take);
   const skip = parseInt(req.query.skip);
   const status = req.query.status;
   const trash = req.query.trash;
-  if (status && trash) {
-    BannerModel.getListByFieldWithLimitOffset2(
-      status,
-      trash,
-      take,
-      skip,
-      (result) => {
-        res.status(result.success ? 200 : 400).json(result);
-      }
-    );
-  } else if (status && !trash) {
-    const field = "status";
-    BannerModel.getListByFieldWithLimitOffset(
-      field,
-      status,
-      take,
-      skip,
-      (result) => {
-        res.status(result.success ? 200 : 400).json(result);
-      }
-    );
-  } else if (!status && trash) {
-    const field = "trash";
-    BannerModel.getListByFieldWithLimitOffset(
-      field,
-      trash,
-      take,
-      skip,
-      (result) => {
-        res.status(result.success ? 200 : 400).json(result);
-      }
-    );
+
+  const fields = [];
+  const values = [];
+
+  if (status) {
+    fields.push("status");
+    values.push(status);
+  }
+
+  if (trash) {
+    fields.push("trash");
+    values.push(trash);
+  }
+
+  if (fields.length > 0) {
+    UserCommentModel.getListWithLimitOffsetByFields(fields, values, take, skip, (result) => {
+      res.status(result.success ? 200 : 400).json(result);
+    });
   } else {
-    BannerModel.getListWithLimitOffset(take, skip, (result) => {
+    UserCommentModel.getListWithLimitOffset(take, skip, (result) => {
       res.status(200).json(result);
     });
   }
