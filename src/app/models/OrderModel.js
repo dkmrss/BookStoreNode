@@ -75,8 +75,8 @@ class OrderModel {
     );
   }
 
-  static create(newComment, callback) {
-    const { error } = OrderSchema.validate(newComment);
+  static create(newOrder, callback) {
+    const { error } = OrderSchema.validate(newOrder);
     if (error) {
       return callback({
         data: [],
@@ -88,7 +88,7 @@ class OrderModel {
 
     this.executeQuery(
       "INSERT INTO orders SET ?",
-      newComment,
+      newOrder,
       "đơn hàng đã được thêm thành công",
       "Không thể thêm đơn hàng",
       (response) => {
@@ -98,10 +98,10 @@ class OrderModel {
     );
   }
 
-  static update(id, updatedComment, callback) {
+  static update(id, updatedOrder, callback) {
     this.executeQuery(
       "UPDATE orders SET ? WHERE id = ?",
-      [updatedComment, id],
+      [updatedOrder, id],
       "Thông tin đơn hàng đã được cập nhật thành công",
       "Không thể cập nhật thông tin đơn hàng",
       (response) => {
@@ -206,7 +206,13 @@ class OrderModel {
     });
   }
 
-  static getListWithLimitOffsetByFields(fields, values, limit, offset, callback) {
+  static getListWithLimitOffsetByFields(
+    fields,
+    values,
+    limit,
+    offset,
+    callback
+  ) {
     if (fields.length !== values.length) {
       return callback({
         data: [],
@@ -216,7 +222,7 @@ class OrderModel {
       });
     }
 
-    const whereClauses = fields.map(field => `${field} = ?`).join(' AND ');
+    const whereClauses = fields.map((field) => `${field} = ?`).join(" AND ");
     const query = `SELECT * FROM orders WHERE ${whereClauses} LIMIT ? OFFSET ?`;
     const countQuery = `SELECT COUNT(*) as totalCount FROM orders WHERE ${whereClauses}`;
 
