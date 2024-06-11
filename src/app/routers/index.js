@@ -4,6 +4,7 @@ const CategoryRouter = require("./CategoryRouter");
 const BannerRouter = require("./BannerRouter");
 const NewRouter = require("./NewRouter");
 const BookInfoRouter = require("./BookInfoRouter");
+const CommentRouter = require("./UserCommentRouter");
 
 const router = express.Router();
 
@@ -28,5 +29,8 @@ router.use("/new", NewRouter);
 
 // Route cho ảnh thêm sách
 router.use("/bookInfo", BookInfoRouter);
+
+// Route cho bình luận
+router.use("/comment", CommentRouter);
 
 module.exports = router;
