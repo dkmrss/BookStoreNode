@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const UserCommentModel = require("../models/UserComment");
+const OrderModel = require("../models/OrderModel");
 
 // Route để lấy danh sách tất cả bình luận của người dùng
 router.get("/get-list", (req, res) => {
-  UserCommentModel.getAll((result) => {
+  OrderModel.getAll((result) => {
     res.status(200).json(result);
   });
 });
@@ -12,24 +12,24 @@ router.get("/get-list", (req, res) => {
 // Route để lấy thông tin chi tiết của một bình luận của người dùng
 router.get("/order-detail/:id", (req, res) => {
   const id = req.params.id;
-  UserCommentModel.getById(id, (result) => {
+  OrderModel.getById(id, (result) => {
     res.status(200).json(result);
   });
 });
 
 // Route để tạo một bình luận của người dùng mới
 router.post("/create", (req, res) => {
-  const newComment = req.body;
-  UserCommentModel.create(newComment, (result) => {
+  const newOrder = req.body;
+  OrderModel.create(newOrder, (result) => {
     res.json(result);
   });
 });
 
 // Route để cập nhật thông tin của một bình luận của người dùng
 router.put("/update/:id", (req, res) => {
-  const commentId = req.params.id;
-  const updatedComment = req.body;
-  UserCommentModel.update(commentId, updatedComment, (result) => {
+  const id = req.params.id;
+  const updatedOrder = req.body;
+  OrderModel.update(id, updatedOrder, (result) => {
     res.status(result.success ? 200 : 400).json(result);
   });
 });
@@ -37,7 +37,7 @@ router.put("/update/:id", (req, res) => {
 // Route để xóa một bình luận của người dùng
 router.delete("/delete/:id", (req, res) => {
   const id = req.params.id;
-  UserCommentModel.delete(id, (result) => {
+  OrderModel.delete(id, (result) => {
     res.status(200).json(result);
   });
 });
@@ -68,7 +68,7 @@ router.get("/get-list-by-field", (req, res) => {
     });
   }
 
-  UserCommentModel.getListWithLimitOffsetByField(
+  OrderModel.getListWithLimitOffsetByField(
     field,
     value,
     takeInt,
@@ -118,7 +118,7 @@ router.get("/get-lists", (req, res) => {
   }
 
   if (fields.length > 0) {
-    UserCommentModel.getListWithLimitOffsetByFields(
+    OrderModel.getListWithLimitOffsetByFields(
       fields,
       values,
       take,
@@ -128,7 +128,7 @@ router.get("/get-lists", (req, res) => {
       }
     );
   } else {
-    UserCommentModel.getListWithLimitOffset(take, skip, (result) => {
+    OrderModel.getListWithLimitOffset(take, skip, (result) => {
       res.status(200).json(result);
     });
   }
