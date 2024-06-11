@@ -371,7 +371,7 @@ class CategoryModel {
 
     const whereClauses = fields.map(field => `${field} = ?`).join(' AND ');
     const query = `SELECT * FROM category WHERE ${whereClauses} LIMIT ? OFFSET ?`;
-    const countQuery = `SELECT COUNT(*) as category FROM orders WHERE ${whereClauses}`;
+    const countQuery = `SELECT COUNT(*) as totalCount FROM category WHERE ${whereClauses}`;
 
     const queryParams = [...values, limit, offset];
     const countParams = values;
