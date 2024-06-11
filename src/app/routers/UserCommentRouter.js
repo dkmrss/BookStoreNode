@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const UserCommentModel = require("../models/UserComment");
-const multer = require("multer");
 
 // Route để lấy danh sách tất cả bình luận của người dùng
 router.get("/get-list", (req, res) => {
@@ -20,8 +19,7 @@ router.get("/comment-detail/:id", (req, res) => {
 
 // Route để tạo một bình luận của người dùng mới
 router.post("/create", (req, res) => {
-  const { book_id, user_id, content } = req.body;
-  const newComment = { book_id, user_id, content };
+  const newComment = req.body;
   UserCommentModel.create(newComment, (result) => {
     res.json(result);
   });
@@ -29,9 +27,9 @@ router.post("/create", (req, res) => {
 
 // Route để cập nhật thông tin của một bình luận của người dùng
 router.put("/update/:id", (req, res) => {
-  const id = req.params.id;
+  const commentId = req.params.id;
   const updatedComment = req.body;
-  UserCommentModel.update(id, updatedComment, (result) => {
+  UserCommentModel.update(commentId, updatedComment, (result) => {
     res.status(result.success ? 200 : 400).json(result);
   });
 });
