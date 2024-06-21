@@ -86,16 +86,28 @@ class OrderModel {
       });
     }
 
-    this.executeQuery(
-      "INSERT INTO orders SET ?",
-      newOrder,
-      "đơn hàng đã được thêm thành công",
-      "Không thể thêm đơn hàng",
-      (response) => {
-        response.data = response.data.insertId;
-        callback(response);
+    db.query("INSERT INTO orders SET ?", newOrder, (err, result) => {
+      if (err) {
+        return callback({
+          data: [],
+          message: "Không thể thêm đơn hàng",
+          success: false,
+          error: err.message,
+        });
       }
-    );
+
+      const insertedId = result.insertId;
+      this.executeQuery(
+        "SELECT * FROM orders WHERE id = ?",
+        [insertedId],
+        "Đơn hàng đã được thêm thành công",
+        "Không thể lấy thông tin đơn hàng sau khi thêm",
+        (response) => {
+          response.data = response.data[0];
+          callback(response);
+        }
+      );
+    });
   }
 
   static update(id, updatedOrder, callback) {
