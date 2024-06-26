@@ -1,8 +1,10 @@
 require("dotenv").config();
 const createError = require("http-errors");
 const express = require("express");
-const dbConnection = require("./src/app/configs/database");
 const systemConfig = require("./src/app/configs/system");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./src/app/configs/swagger"); // Đường dẫn đến tệp swagger.js đã cấu hình
+
 const app = express();
 const path = require("path");
 
@@ -21,8 +23,12 @@ global.__path_configs = __path_app + pathConfig.folder_configs + "";
 app.locals.systemConfig = systemConfig;
 
 // Gọi hàm để kết nối đến cơ sở dữ liệu
-const connection = dbConnection;
+// Bạn có thể gọi hàm kết nối cơ sở dữ liệu ở đây (nếu cần)
 
+// Sử dụng Swagger UI
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Sử dụng router từ các tệp trong thư mục routers
 app.use("/api/v1/", require(__path_routers));
 
 // Phục vụ các tệp tĩnh từ thư mục "assets"
@@ -41,10 +47,12 @@ app.use(
   express.static(path.join(__dirname, "assets", "BookInfo"))
 );
 
+// Xử lý lỗi 404 - Endpoint không tồn tại
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
+// Xử lý lỗi tổng quát
 app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
@@ -69,3 +77,5 @@ const port = app.locals.systemConfig.port || 3000;
 app.listen(port, () => {
   console.log(`Ứng dụng đang chạy trên cổng ${port}`);
 });
+
+module.exports = app;
