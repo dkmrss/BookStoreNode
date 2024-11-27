@@ -23,7 +23,7 @@ router.use("/category", CategoryRouter);
 router.use("/banner", BannerRouter);
 
 // Route cho bài viết
-router.use("/new", NewRouter);
+router.use("/news", NewRouter);
 
 // Route cho ảnh thêm sách
 router.use("/bookInfo", BookInfoRouter);

@@ -21,7 +21,7 @@ const upload = multer({ storage: storage });
  */
 /**
  * @swagger
- * /banners/get-list:
+ * /banner/get-list:
  *   get:
  *     summary: Lấy danh sách tất cả banner
  *     tags: [Banners]
@@ -39,7 +39,7 @@ router.get("/get-list", (req, res) => {
 
 /**
  * @swagger
- * /banners/banner-detail/{id}:
+ * /banner/banner-detail/{id}:
  *   get:
  *     summary: Lấy thông tin chi tiết banner
  *     tags: [Banners]
@@ -67,7 +67,7 @@ router.get("/banner-detail/:id", (req, res) => {
 
 /**
  * @swagger
- * /banners/status/{status}:
+ * /banner/status/{status}:
  *   get:
  *     summary: Lấy danh sách banner theo trạng thái
  *     tags: [Banners]
@@ -94,7 +94,7 @@ router.get("/status/:status", (req, res) => {
 
 /**
  * @swagger
- * /banners/trash/{trash}:
+ * /banner/trash/{trash}:
  *   get:
  *     summary: Lấy danh sách banner theo trạng thái trash
  *     tags: [Banners]
@@ -121,7 +121,7 @@ router.get("/trash/:trash", (req, res) => {
 
 /**
  * @swagger
- * /banners/get-lists:
+ * /banner/get-lists:
  *   get:
  *     summary: Lấy danh sách banner với giới hạn và phân trang
  *     tags: [Banners]
@@ -172,7 +172,7 @@ router.get("/get-lists", (req, res) => {
   }
 
   if (fields.length > 0) {
-    UserCommentModel.getListWithLimitOffsetByFields(
+    BannerModel.getListWithLimitOffsetByFields(
       fields,
       values,
       take,
@@ -182,14 +182,14 @@ router.get("/get-lists", (req, res) => {
       }
     );
   } else {
-    UserCommentModel.getListWithLimitOffset(take, skip, (result) => {
+    BannerModel.getListWithLimitOffset(take, skip, (result) => {
       res.status(200).json(result);
     });
   }
 });
 /**
  * @swagger
- * /banners/create:
+ * /banner/create:
  *   post:
  *     summary: Tạo banner mới
  *     tags: [Banners]
@@ -241,7 +241,7 @@ router.post("/create", upload.single("image"), (req, res) => {
 
 /**
  * @swagger
- * /banners/update/{id}:
+ * /banner/update/{id}:
  *   put:
  *     summary: Cập nhật banner
  *     tags: [Banners]
@@ -300,7 +300,7 @@ router.put("/update/:id", upload.single("image"), (req, res) => {
 
 /**
  * @swagger
- * /banners/status/{id}:
+ * /banner/status/{id}:
  *   put:
  *     summary: Cập nhật trạng thái banner
  *     tags: [Banners]
@@ -338,7 +338,7 @@ router.put("/status/:id", (req, res) => {
 
 /**
  * @swagger
- * /banners/trash/{id}:
+ * /banner/trash/{id}:
  *   put:
  *     summary: Cập nhật trạng thái trash của banner
  *     tags: [Banners]
@@ -375,7 +375,7 @@ router.put("/trash/:id", (req, res) => {
 
 /**
  * @swagger
- * /banners/delete/{id}:
+ * /banner/delete/{id}:
  *   delete:
  *     summary: Xóa banner
  *     tags: [Banners]
