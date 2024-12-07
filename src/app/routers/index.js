@@ -6,15 +6,15 @@ const NewRouter = require("./NewRouter");
 const BookInfoRouter = require("./BookInfoRouter");
 const CommentRouter = require("./UserCommentRouter");
 const OrderRouter = require("./OrderRouter");
-
+const ProductsRouter = require("./ProductsRouter");
 const router = express.Router();
 
 // Route cho các ví dụ
 // Route cho người dùng
 router.use("/users", UsersRouter);
 
-// // Route cho sách
-// router.use('/books', BookRouter);
+// // Route cho lấy sản phẩm
+router.use('/products', ProductsRouter);
 
 // Route cho danh mục
 router.use("/category", CategoryRouter);
@@ -29,7 +29,7 @@ router.use("/news", NewRouter);
 router.use("/bookInfo", BookInfoRouter);
 
 // Route cho bình luận
-router.use("/comment", CommentRouter);
+router.use("/user-comment", CommentRouter);
 
 // Route cho đơn hàng
 router.use("/orders", OrderRouter);

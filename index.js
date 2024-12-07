@@ -46,6 +46,10 @@ app.use(
   "/assets/BookInfo",
   express.static(path.join(__dirname, "assets", "BookInfo"))
 );
+app.use(
+  "/assets/ProductImage",
+  express.static(path.join(__dirname, "assets", "ProductImage"))
+);
 
 // Xử lý lỗi 404 - Endpoint không tồn tại
 app.use(function (req, res, next) {
