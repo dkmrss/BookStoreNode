@@ -259,6 +259,34 @@ class ProductsModel {
     }
   }
 
+  static async getProductsByCategory(category, limit, offset, callback) {
+    try {
+      const rows = await this.executeQuery(
+        "SELECT * FROM products WHERE category_id=? AND status=0 AND trash=0  LIMIT ? OFFSET ?",
+        [category, limit, offset]
+      );
+      const countResult = await this.executeQuery(
+        "SELECT COUNT(*) as totalCount FROM products WHERE category_id=? AND status=0 AND trash=0 ",
+        [category]
+      );
+      callback({
+        data: rows,
+        message: "Danh sách sản phẩm theo danh mục đã được lấy thành công",
+        success: true,
+        error: "",
+        totalCount: countResult[0].totalCount,
+      });
+    } catch (err) {
+      callback({
+        data: [],
+        message: "Không thể lấy danh sách sản phẩm theo danh mục",
+        success: false,
+        error: err.message,
+        totalCount: 0,
+      });
+    }
+  }
+
   static getRecommend(userId, limit, offset, callback) {
     const query = `
         SELECT DISTINCT p.*

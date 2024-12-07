@@ -121,6 +121,43 @@ router.get("/get-new-products", (req, res) => {
 
 /**
  * @swagger
+ * /products/get-products-by-category:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm mới
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: integer
+ *         description: Mã thể loại
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Số lượng sản phẩm cần lấy
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         description: Số lượng sản phẩm cần bỏ qua
+ *     responses:
+ *       200:
+ *         description: Danh sách sản phẩm mới
+ *       500:
+ *         description: Lỗi máy chủ
+ */
+router.get("/get-products-by-category", (req, res) => {
+  const category = parseInt(req.query.category) || 0;
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = parseInt(req.query.offset) || 0;
+  ProductsModel.getProductsByCategory(category, limit, offset, (result) => {
+    res.status(200).json(result);
+  });
+});
+
+/**
+ * @swagger
  * /products/get-sale-products:
  *   get:
  *     summary: Lấy danh sách sản phẩm đang giảm giá
