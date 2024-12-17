@@ -99,25 +99,6 @@ router.get("/get-list-with-limit-offset", (req, res) => {
     });
   });
 
-/**
- * @swagger
- * /products/get-new-products:
- *   get:
- *     summary: Lấy danh sách sản phẩm mới
- *     tags: [Products]
- *     responses:
- *       200:
- *         description: Danh sách sản phẩm mới
- *       500:
- *         description: Lỗi máy chủ
- */
-router.get("/get-new-products", (req, res) => {
-  const limit = parseInt(req.query.limit) || 5;
-  const offset = parseInt(req.query.offset) || 0;
-  ProductsModel.getNewProducts(limit, offset, (result) => {
-    res.status(200).json(result);
-  });
-});
 
 /**
  * @swagger
@@ -158,10 +139,52 @@ router.get("/get-products-by-category", (req, res) => {
 
 /**
  * @swagger
+ * /products/get-new-products:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm mới
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Số lượng sản phẩm cần lấy (mặc định 5)
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         description: Vị trí bắt đầu lấy sản phẩm (mặc định 0)
+ *     responses:
+ *       200:
+ *         description: Danh sách sản phẩm mới
+ *       500:
+ *         description: Lỗi máy chủ
+ */
+router.get("/get-new-products", (req, res) => {
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = parseInt(req.query.offset) || 0;
+  ProductsModel.getNewProducts(limit, offset, (result) => {
+    res.status(200).json(result);
+  });
+});
+
+/**
+ * @swagger
  * /products/get-sale-products:
  *   get:
  *     summary: Lấy danh sách sản phẩm đang giảm giá
  *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Số lượng sản phẩm cần lấy (mặc định 10)
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         description: Vị trí bắt đầu lấy sản phẩm (mặc định 0)
  *     responses:
  *       200:
  *         description: Danh sách sản phẩm giảm giá

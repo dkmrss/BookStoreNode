@@ -10,6 +10,7 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname); // Tên file sẽ được lưu trữ
   },
+  
 });
 
 const upload = multer({ storage: storage });
@@ -64,6 +65,40 @@ router.get("/banner-detail/:id", (req, res) => {
     res.status(200).json(result);
   });
 });
+
+
+/**
+ * @swagger
+ * /banner/active:
+ *   get:
+ *     summary: Lấy danh sách banner còn hạn
+ *     tags: [Banners]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Số lượng bản ghi giới hạn
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         description: Vị trí bắt đầu lấy bản ghi
+ *     responses:
+ *       200:
+ *         description: Danh sách banner còn hạn
+ *       500:
+ *         description: Lỗi máy chủ
+ */
+router.get("/active", (req, res) => {
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = parseInt(req.query.offset) || 0;
+
+  BannerModel.getActiveBanners(limit, offset, (result) => {
+    res.status(result.success ? 200 : 500).json(result);
+  });
+});
+
 
 /**
  * @swagger
@@ -230,10 +265,11 @@ router.get("/get-lists", (req, res) => {
  */
 router.post("/create", upload.single("image"), (req, res) => {
   const { date_start, date_end, status, trash, title } = req.body;
-  const image = req.file ? req.file.path : ""; // Lưu đường dẫn của file ảnh vào trường avatar
+  const image = req.file ? req.file.path : "";
 
   const newBanner = { date_start, date_end, status, trash, title, image };
-
+  console.log("File uploaded:", req.file);
+  console.log("Request body:", req.body);
   BannerModel.create(newBanner, (result) => {
     res.json(result);
   });

@@ -1,4 +1,5 @@
 const express = require("express");
+const AuthRouter = require("./AuthRouter");
 const UsersRouter = require("./UsersRouter"); // Đường dẫn đến UsersRouter
 const CategoryRouter = require("./CategoryRouter");
 const BannerRouter = require("./BannerRouter");
@@ -10,6 +11,10 @@ const ProductsRouter = require("./ProductsRouter");
 const router = express.Router();
 
 // Route cho các ví dụ
+
+// Route cho đăng nhập
+router.use("/auth", AuthRouter);
+
 // Route cho người dùng
 router.use("/users", UsersRouter);
 

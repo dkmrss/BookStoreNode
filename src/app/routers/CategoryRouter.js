@@ -288,9 +288,10 @@ router.get("/get-list-by-field", (req, res) => {
  *         description: Lỗi máy chủ
  */
 router.post("/create", upload.single("illustration"), (req, res) => {
+  console.log("File uploaded:", req.file);
+  console.log("Request body:", req.body);
   const { category_name } = req.body;
   const illustration = req.file ? req.file.path : ""; // Lưu đường dẫn của file ảnh vào trường illustration
-
   const newCategory = { category_name, illustration };
 
   CategoryModel.create(newCategory, (result) => {

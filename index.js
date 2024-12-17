@@ -77,7 +77,7 @@ app.use(function (err, req, res, next) {
 });
 
 // Sử dụng cổng từ cấu hình hệ thống
-const port = app.locals.systemConfig.port || 3000;
+const port = app.locals.systemConfig.port || 3001;
 app.listen(port, () => {
   console.log(`Ứng dụng đang chạy trên cổng ${port}`);
 });

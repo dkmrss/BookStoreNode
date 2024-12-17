@@ -5,7 +5,7 @@ const ProductSchema = Joi.object({
   publisher: Joi.string().max(255).required(), // Nhà xuất bản, bắt buộc
   author: Joi.string().max(255).required(), // Tác giả, bắt buộc
   category_id: Joi.number().integer().required(), // ID danh mục, bắt buộc
-  sale: Joi.boolean().default(true), // Có giảm giá không, mặc định là true
+  sale: Joi.number().default(true), // Có giảm giá không, mặc định là true
   image: Joi.string().max(255).required(), // Đường dẫn ảnh, bắt buộc
   quantity: Joi.number().integer().min(0).default(0), // Số lượng, mặc định là 0
   price: Joi.number().positive().required(), // Giá gốc, bắt buộc

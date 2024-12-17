@@ -73,6 +73,42 @@ class BannerModel {
     }
   }
 
+  static async getActiveBanners(limit, offset, callback) {
+    try {
+      const query = `
+        SELECT image, title 
+        FROM banner 
+        WHERE status = 0 AND trash = 0 
+        AND date_end > NOW() 
+        AND date_start < NOW() 
+        ORDER BY date_end ASC 
+        LIMIT ? OFFSET ?
+      `;
+      const rows = await this.executeQuery(query, [limit, offset]);
+      const countResult = await this.executeQuery(
+        `SELECT COUNT(*) as totalCount FROM banner 
+         WHERE status = 0 AND trash = 0 
+         AND date_end > NOW() 
+         AND date_start < NOW()`
+      );
+      callback({
+        data: rows,
+        message: "Danh sách banner còn hạn đã được lấy thành công",
+        success: true,
+        error: "",
+        totalCount: countResult[0].totalCount,
+      });
+    } catch (err) {
+      callback({
+        data: [],
+        message: "Không thể lấy danh sách banner còn hạn",
+        success: false,
+        error: err.message,
+        totalCount: 0,
+      });
+    }
+  }
+
   static async getListWithLimitOffset(limit, offset, callback) {
     try {
       const rows = await this.executeQuery(
