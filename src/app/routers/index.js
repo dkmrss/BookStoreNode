@@ -1,6 +1,7 @@
 const express = require("express");
 const AuthRouter = require("./AuthRouter");
 const UsersRouter = require("./UsersRouter"); // Đường dẫn đến UsersRouter
+const CartRouter = require("./CartRouter");
 const CategoryRouter = require("./CategoryRouter");
 const BannerRouter = require("./BannerRouter");
 const NewRouter = require("./NewRouter");
@@ -17,6 +18,9 @@ router.use("/auth", AuthRouter);
 
 // Route cho người dùng
 router.use("/users", UsersRouter);
+
+// Route cho giỏ hàng
+router.use("/cart", CartRouter);
 
 // // Route cho lấy sản phẩm
 router.use('/products', ProductsRouter);

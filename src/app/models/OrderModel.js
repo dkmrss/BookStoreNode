@@ -75,38 +75,118 @@ class OrderModel {
     );
   }
 
-  static create(newOrder, callback) {
+  static create(newOrder, orderDetails, callback) {
     const { error } = OrderSchema.validate(newOrder);
     if (error) {
       return callback({
-        data: [],
-        message: "Dữ liệu không hợp lệ",
         success: false,
+        message: "Dữ liệu không hợp lệ",
         error: error.details[0].message,
       });
     }
-
-    db.query("INSERT INTO orders SET ?", newOrder, (err, result) => {
+  
+    const queryInsertOrder = "INSERT INTO orders SET ?";
+    const queryInsertOrderDetails = "INSERT INTO order_details (order_id, product_id, quantity, price) VALUES ?";
+    const queryDeleteCart = "DELETE FROM cart WHERE user_id = ?";
+    const queryUpdateProductQuantity = "UPDATE products SET quantity = quantity - ? WHERE id = ?";
+  
+    db.beginTransaction((err) => {
       if (err) {
         return callback({
-          data: [],
-          message: "Không thể thêm đơn hàng",
           success: false,
+          message: "Không thể bắt đầu giao dịch",
           error: err.message,
         });
       }
-
-      const insertedId = result.insertId;
-      this.executeQuery(
-        "SELECT * FROM orders WHERE id = ?",
-        [insertedId],
-        "Đơn hàng đã được thêm thành công",
-        "Không thể lấy thông tin đơn hàng sau khi thêm",
-        (response) => {
-          response.data = response.data[0];
-          callback(response);
+  
+      // Tạo đơn hàng
+      db.query(queryInsertOrder, newOrder, (err, result) => {
+        if (err) {
+          return db.rollback(() => {
+            callback({
+              success: false,
+              message: "Không thể tạo đơn hàng",
+              error: err.message,
+            });
+          });
         }
-      );
+  
+        const orderId = result.insertId;
+  
+        // Chuẩn bị dữ liệu cho bảng order_details
+        const orderDetailsValues = orderDetails.map((item) => [
+          orderId,
+          item.product_id,
+          item.quantity,
+          item.price,
+        ]);
+  
+        // Thêm order_details
+        db.query(queryInsertOrderDetails, [orderDetailsValues], (err) => {
+          if (err) {
+            return db.rollback(() => {
+              callback({
+                success: false,
+                message: "Không thể thêm chi tiết đơn hàng",
+                error: err.message,
+              });
+            });
+          }
+  
+          // Xóa giỏ hàng
+          db.query(queryDeleteCart, [newOrder.customer_id], (err) => {
+            if (err) {
+              return db.rollback(() => {
+                callback({
+                  success: false,
+                  message: "Không thể xóa giỏ hàng",
+                  error: err.message,
+                });
+              });
+            }
+  
+            // Giảm số lượng sản phẩm trong kho
+            const updateProductTasks = orderDetails.map((item) =>
+              new Promise((resolve, reject) => {
+                db.query(queryUpdateProductQuantity, [item.quantity, item.product_id], (err) => {
+                  if (err) reject(err);
+                  else resolve();
+                });
+              })
+            );
+  
+            Promise.all(updateProductTasks)
+              .then(() => {
+                db.commit((err) => {
+                  if (err) {
+                    return db.rollback(() => {
+                      callback({
+                        success: false,
+                        message: "Không thể hoàn tất giao dịch",
+                        error: err.message,
+                      });
+                    });
+                  }
+  
+                  callback({
+                    success: true,
+                    message: "Đơn hàng đã được tạo thành công",
+                    data: { orderId },
+                  });
+                });
+              })
+              .catch((err) => {
+                db.rollback(() => {
+                  callback({
+                    success: false,
+                    message: "Không thể cập nhật số lượng sản phẩm",
+                    error: err.message,
+                  });
+                });
+              });
+          });
+        });
+      });
     });
   }
 

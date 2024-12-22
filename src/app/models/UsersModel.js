@@ -2,7 +2,7 @@ const db = require("../configs/database");
 const userSchema = require("../schemas/UsersSchema");
 const fs = require('fs');
 const path = require("path");
-
+const md5 = require("md5");
 class UserModel {
   static async executeQuery(query, params = []) {
     return new Promise((resolve, reject) => {
@@ -89,13 +89,27 @@ class UserModel {
     if (error) {
       return this.handleErrorWithImageDeletion(error, avatar, "Dữ liệu không hợp lệ", callback);
     }
+  
     try {
+      // Kiểm tra email đã tồn tại
       const existingUsers = await this.executeQuery("SELECT * FROM users WHERE email = ?", [email]);
       if (existingUsers.length > 0) {
         return this.handleErrorWithImageDeletion(new Error("Email đã tồn tại"), avatar, "Email đã tồn tại", callback);
       }
-
-      const result = await this.executeQuery("INSERT INTO users SET ?", { email, password, name, phone, address, avatar });
+  
+      // Mã hóa mật khẩu bằng MD5
+      const hashedPassword = md5(password);
+  
+      // Thêm người dùng mới với mật khẩu đã mã hóa
+      const result = await this.executeQuery("INSERT INTO users SET ?", {
+        email,
+        password: hashedPassword,
+        name,
+        phone,
+        address,
+        avatar,
+      });
+  
       callback({
         data: result.insertId,
         message: "Người dùng đã được thêm thành công",

@@ -268,8 +268,6 @@ router.post("/create", upload.single("image"), (req, res) => {
   const image = req.file ? req.file.path : "";
 
   const newBanner = { date_start, date_end, status, trash, title, image };
-  console.log("File uploaded:", req.file);
-  console.log("Request body:", req.body);
   BannerModel.create(newBanner, (result) => {
     res.json(result);
   });

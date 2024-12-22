@@ -240,7 +240,7 @@ router.get("/get-lists", (req, res) => {
  * @swagger
  * /orders/create:
  *   post:
- *     summary: Tạo mới một đơn hàng
+ *     summary: Tạo đơn hàng mới
  *     tags: [Orders]
  *     requestBody:
  *       required: true
@@ -249,19 +249,46 @@ router.get("/get-lists", (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               // Định nghĩa các thuộc tính của đơn hàng cần tạo ở đây
+ *               customer_id:
+ *                 type: integer
+ *               total:
+ *                 type: number
+ *               method:
+ *                 type: integer
+ *               payment:
+ *                 type: integer
+ *               note:
+ *                 type: string
+ *               orderDetails:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     product_id:
+ *                       type: integer
+ *                     quantity:
+ *                       type: integer
+ *                     price:
+ *                       type: number
  *     responses:
- *       201:
+ *       200:
  *         description: Đơn hàng được tạo thành công
- *       400:
- *         description: Yêu cầu không hợp lệ
  *       500:
  *         description: Lỗi máy chủ
  */
 router.post("/create", (req, res) => {
-  const newOrder = req.body;
-  OrderModel.create(newOrder, (result) => {
-    res.json(result);
+  const { customer_id, total, method, payment, note, orderDetails } = req.body;
+
+  const newOrder = {
+    customer_id,
+    total,
+    method,
+    payment,
+    note,
+  };
+
+  OrderModel.create(newOrder, orderDetails, (result) => {
+    res.status(result.success ? 200 : 500).json(result);
   });
 });
 

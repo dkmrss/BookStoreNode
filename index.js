@@ -4,11 +4,19 @@ const express = require("express");
 const systemConfig = require("./src/app/configs/system");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./src/app/configs/swagger"); // Đường dẫn đến tệp swagger.js đã cấu hình
-
+const cors = require("cors");
 const app = express();
 const path = require("path");
 
 app.use(express.json());
+
+app.options("*", cors());
+
+app.use(cors({
+  origin: "*", // Domain frontend được phép
+  methods: ["GET", "POST", "PUT", "DELETE"], // Các phương thức HTTP được phép
+  allowedHeaders: ["Content-Type", "Authorization"], // Các header được phép
+}))
 
 const pathConfig = require("./src/path");
 global.__base = __dirname + "/src";

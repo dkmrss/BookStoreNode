@@ -48,6 +48,7 @@ class AuthModel {
         data: {
           id: user.id,
           email: user.email,
+          avatar: user.avatar,
           name: user.name,
           role: user.role,
         },
