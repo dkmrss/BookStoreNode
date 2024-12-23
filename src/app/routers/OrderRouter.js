@@ -277,10 +277,31 @@ router.get("/get-lists", (req, res) => {
  *         description: Lỗi máy chủ
  */
 router.post("/create", (req, res) => {
-  const { customer_id, total, method, payment, note, orderDetails } = req.body;
+  const { customer_id, total, method, payment, note, orderDetails, name, phone, address } = req.body;
+
+  if (
+    typeof customer_id !== "number" ||
+    typeof name !== "string" ||
+    typeof phone !== "string" ||
+    typeof address !== "string" ||
+    typeof total !== "number" ||
+    typeof method !== "number" ||
+    typeof payment !== "number" ||
+    !Array.isArray(orderDetails) ||
+    orderDetails.length === 0
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Dữ liệu không hợp lệ. Vui lòng kiểm tra các trường bắt buộc.",
+      error: "Thiếu dữ liệu hoặc dữ liệu không hợp lệ.",
+    });
+  }
 
   const newOrder = {
     customer_id,
+    name,
+    phone,
+    address,
     total,
     method,
     payment,

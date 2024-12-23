@@ -37,7 +37,7 @@ router.get("/", (req, res) => {
 
 /**
  * @swagger
- * /cart:
+ * /cart/addCart:
  *   post:
  *     summary: Thêm sản phẩm vào giỏ hàng
  *     tags: [Cart]
@@ -60,7 +60,7 @@ router.get("/", (req, res) => {
  *       500:
  *         description: Lỗi máy chủ
  */
-router.post("/", (req, res) => {
+router.post("/addCart", (req, res) => {
   const { userId, productId, quantity } = req.body;
 
   CartModel.addToCart(userId, productId, quantity, (result) => {
@@ -115,7 +115,7 @@ router.put("/", (req, res) => {
 
 /**
  * @swagger
- * /cart:
+ * /cart/delete:
  *   delete:
  *     summary: Xóa sản phẩm khỏi giỏ hàng
  *     tags: [Cart]
@@ -138,7 +138,7 @@ router.put("/", (req, res) => {
  *       500:
  *         description: Lỗi máy chủ
  */
-router.delete("/", (req, res) => {
+router.delete("/delete", (req, res) => {
     const { userId, productId } = req.query;
   
     if (!userId || !productId) {
