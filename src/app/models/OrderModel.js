@@ -89,6 +89,7 @@ class OrderModel {
     const queryInsertOrderDetails = "INSERT INTO order_details (order_id, product_id, quantity, price) VALUES ?";
     const queryDeleteCart = "DELETE FROM cart WHERE user_id = ?";
     const queryUpdateProductQuantity = "UPDATE products SET quantity = quantity - ? WHERE id = ?";
+    const queryGetOrderDetails = "SELECT * FROM orders WHERE id = ?";
   
     db.beginTransaction((err) => {
       if (err) {
@@ -168,10 +169,21 @@ class OrderModel {
                     });
                   }
   
-                  callback({
-                    success: true,
-                    message: "Đơn hàng đã được tạo thành công",
-                    data: { orderId },
+                  // Lấy chi tiết đơn hàng vừa tạo
+                  db.query(queryGetOrderDetails, [orderId], (err, rows) => {
+                    if (err) {
+                      return callback({
+                        success: false,
+                        message: "Không thể lấy chi tiết đơn hàng",
+                        error: err.message,
+                      });
+                    }
+  
+                    callback({
+                      success: true,
+                      message: "Đơn hàng đã được tạo thành công",
+                      data: rows[0], // Trả về đầy đủ chi tiết đơn hàng
+                    });
                   });
                 });
               })
@@ -189,6 +201,7 @@ class OrderModel {
       });
     });
   }
+  
 
   static update(id, updatedOrder, callback) {
     this.executeQuery(
