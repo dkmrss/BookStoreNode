@@ -414,7 +414,30 @@ class ProductsModel {
 
   static async search(searchTerm, limit, offset, callback) {
     try {
-      const likeTerm = `%${searchTerm}%`;
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      const likeTerm = `%${lowerCaseSearchTerm}%`;
+  
+      // Kiểm tra xem từ khóa đã tồn tại trong bảng search_logs chưa
+      const existingLog = await this.executeQuery(
+        "SELECT * FROM search_keywords WHERE keyword = ?",
+        [lowerCaseSearchTerm]
+      );
+  //keyword, created_at, search_keyword
+      if (existingLog.length > 0) {
+        // Nếu từ khóa đã tồn tại, tăng time_search
+        await this.executeQuery(
+          "UPDATE search_keywords SET time_search = time_search + 1 WHERE keyword = ?",
+          [lowerCaseSearchTerm]
+        );
+      } else {
+        // Nếu từ khóa chưa tồn tại, thêm mới vào bảng search_logs
+        await this.executeQuery(
+          "INSERT INTO search_keywords (keyword, time_search, created_at) VALUES (?, 1, NOW())",
+          [lowerCaseSearchTerm]
+        );
+      }
+  
+      // Thực hiện tìm kiếm sản phẩm
       const rows = await this.executeQuery(
         "SELECT * FROM products WHERE trash=0 AND status=0 AND (product_name LIKE ? OR publisher LIKE ? OR author LIKE ?) LIMIT ? OFFSET ?",
         [likeTerm, likeTerm, likeTerm, limit, offset]
@@ -423,6 +446,7 @@ class ProductsModel {
         "SELECT COUNT(*) as totalCount FROM products WHERE trash=0 AND status=0 AND (product_name LIKE ? OR publisher LIKE ? OR author LIKE ?)",
         [likeTerm, likeTerm, likeTerm]
       );
+  
       callback({
         data: rows,
         message: "Kết quả tìm kiếm đã được lấy thành công",
