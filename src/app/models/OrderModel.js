@@ -55,24 +55,41 @@ class OrderModel {
   }
 
   static getById(id, callback) {
-    this.executeQuery(
-      "SELECT * FROM orders WHERE id = ?",
-      [id],
-      "Thông tin đơn hàng đã được lấy thành công",
-      "Không thể lấy thông tin đơn hàng",
-      (response) => {
-        if (response.data.length === 0) {
-          return callback({
-            data: {},
-            message: "Không tìm thấy đơn hàng",
-            success: false,
-            error: "",
-          });
-        }
-        response.data = response.data[0];
-        callback(response);
+    const orderQuery = "SELECT * FROM orders WHERE id = ?";
+    const orderDetailsQuery = `
+      SELECT od.product_id, od.quantity, od.price, p.product_name, p.image
+      FROM order_details od
+      JOIN products p ON od.product_id = p.id
+      WHERE od.order_id = ?
+    `;
+  
+    this.executeQuery(orderQuery, [id], "Thông tin đơn hàng đã được lấy thành công", "Không thể lấy thông tin đơn hàng", (response) => {
+      if (response.data.length === 0) {
+        return callback({
+          data: {},
+          message: "Không tìm thấy đơn hàng",
+          success: false,
+          error: "",
+        });
       }
-    );
+  
+      const orderData = response.data[0];
+  
+      this.executeQuery(orderDetailsQuery, [id], "Chi tiết sản phẩm đã được lấy thành công", "Không thể lấy chi tiết sản phẩm", (productResponse) => {
+        if (!productResponse.success) {
+          return callback(productResponse);
+        }
+  
+        orderData.orderDetails = productResponse.data;
+  
+        callback({
+          data: orderData,
+          message: "Thông tin đơn hàng đã được lấy thành công",
+          success: true,
+          error: "",
+        });
+      });
+    });
   }
 
   static create(newOrder, orderDetails, callback) {

@@ -414,4 +414,41 @@ router.get("/search", (req, res) => {
     });
   });
 
+  /**
+ * @swagger
+ * /products/top-keywords-products:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm liên quan đến các từ khóa được tìm kiếm nhiều nhất
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: keywordLimit
+ *         schema:
+ *           type: integer
+ *         description: Số lượng từ khóa lấy
+ *       - in: query
+ *         name: productLimit
+ *         schema:
+ *           type: integer
+ *         description: Số lượng sản phẩm lấy
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         description: Vị trí bắt đầu lấy sản phẩm
+ *     responses:
+ *       200:
+ *         description: Danh sách sản phẩm liên quan đến từ khóa
+ *       500:
+ *         description: Lỗi máy chủ
+ */
+router.get("/top-keywords-products", (req, res) => {
+  const keywordLimit = parseInt(req.query.keywordLimit) || 5;
+  const productLimit = parseInt(req.query.productLimit) || 10;
+  const offset = parseInt(req.query.offset) || 0;
+
+  ProductsModel.getProductsByTopKeywords(keywordLimit, productLimit, offset, (result) => {
+    res.status(result.success ? 200 : 500).json(result);
+  });
+});
 module.exports = router;

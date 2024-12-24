@@ -63,7 +63,6 @@ class AuthModel {
     }
   }
 
-
   static async logout(token, callback) {
     try {
       // Implement a blacklist or token invalidation logic
@@ -100,6 +99,58 @@ class AuthModel {
       callback({
         success: false,
         message: "Lỗi khi xử lý quên mật khẩu",
+        error: err.message,
+      });
+    }
+  }
+
+  static async changePassword(userId, oldPassword, newPassword, callback) {
+    try {
+      const queryGetUser = "SELECT * FROM users WHERE id = ?";
+      const user = await new Promise((resolve, reject) => {
+        db.query(queryGetUser, [userId], (err, result) => {
+          if (err) return reject(err);
+          resolve(result[0]);
+        });
+      });
+
+      if (!user) {
+        return callback({
+          success: false,
+          message: "Người dùng không tồn tại",
+          error: "",
+        });
+      }
+
+      const hashedOldPassword = md5(oldPassword);
+      if (user.password !== hashedOldPassword) {
+        return callback({
+          success: false,
+          message: "Mật khẩu cũ không đúng",
+          error: "",
+        });
+      }
+
+      const hashedNewPassword = md5(newPassword);
+      const queryUpdatePassword = "UPDATE users SET password = ? WHERE id = ?";
+      db.query(queryUpdatePassword, [hashedNewPassword, userId], (err) => {
+        if (err) {
+          return callback({
+            success: false,
+            message: "Lỗi khi đổi mật khẩu",
+            error: err.message,
+          });
+        }
+        callback({
+          success: true,
+          message: "Đổi mật khẩu thành công",
+          error: "",
+        });
+      });
+    } catch (err) {
+      callback({
+        success: false,
+        message: "Lỗi hệ thống",
         error: err.message,
       });
     }

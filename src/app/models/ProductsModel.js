@@ -465,6 +465,68 @@ class ProductsModel {
     }
   }
 
+  static async getProductsByTopKeywords(keywordLimit, productLimit, offset, callback) {
+    try {
+      // Lấy top từ khóa tìm kiếm nhiều nhất
+      const topKeywords = await this.executeQuery(
+        "SELECT keyword FROM search_keywords ORDER BY time_search DESC LIMIT ?",
+        [keywordLimit]
+      );
+  
+      if (topKeywords.length === 0) {
+        return callback({
+          data: [],
+          message: "Không có từ khóa tìm kiếm",
+          success: true,
+          error: "",
+        });
+      }
+  
+      // Xây dựng điều kiện tìm kiếm từ các từ khóa
+      const searchConditions = topKeywords
+        .map(() => "(product_name LIKE ? OR publisher LIKE ? OR author LIKE ?)")
+        .join(" OR ");
+      const searchParams = topKeywords.flatMap((keyword) => [
+        `%${keyword.keyword}%`,
+        `%${keyword.keyword}%`,
+        `%${keyword.keyword}%`,
+      ]);
+  
+      // Lấy danh sách sản phẩm
+      const products = await this.executeQuery(
+        `SELECT * FROM products 
+         WHERE trash=0 AND status=0 AND (${searchConditions}) 
+         LIMIT ? OFFSET ?`,
+        [...searchParams, productLimit, offset]
+      );
+  
+      // Đếm tổng số sản phẩm liên quan đến từ khóa
+      const countResult = await this.executeQuery(
+        `SELECT COUNT(*) as totalCount 
+         FROM products 
+         WHERE trash=0 AND status=0 AND (${searchConditions})`,
+        searchParams
+      );
+  
+      callback({
+        data: products,
+        message: "Danh sách sản phẩm liên quan đến từ khóa được lấy thành công",
+        success: true,
+        error: "",
+        totalCount: countResult[0].totalCount,
+      });
+    } catch (err) {
+      callback({
+        data: [],
+        message: "Không thể lấy sản phẩm liên quan đến từ khóa",
+        success: false,
+        error: err.message,
+        totalCount: 0,
+      });
+    }
+  }
+  
+  
   static async handleImageDeletion(imagePath) {
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
