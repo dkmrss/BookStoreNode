@@ -13,7 +13,7 @@ class AuthModel {
           resolve(result);
         });
       });
-
+  
       if (users.length === 0) {
         return callback({
           success: false,
@@ -22,8 +22,20 @@ class AuthModel {
           token: null,
         });
       }
-
+  
       const user = users[0];
+  
+      // Kiểm tra trạng thái của tài khoản
+      if (user.status === 1) {
+        return callback({
+          success: false,
+          message: "Tài khoản của bạn đã bị khóa, vui lòng liên hệ admin để biết thêm thông tin chi tiết",
+          error: "",
+          token: null,
+        });
+      }
+  
+      // Kiểm tra mật khẩu
       const hashedPassword = md5(password);
       if (user.password !== hashedPassword) {
         return callback({
@@ -33,13 +45,14 @@ class AuthModel {
           token: null,
         });
       }
-
+  
+      // Tạo token
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
-
+  
       callback({
         success: true,
         message: "Đăng nhập thành công",
